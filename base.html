@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Grabby</title>
+        <style>
+            canvas{
+                box-shadow:0 0 0 2px #000;
+                height: 675;
+                width: 1200;
+            }
+        </style>
+    </head>
+    <body onload="main()" onkeydown="down(event.key)" >
+        <canvas>The canvas goes here</canvas>
+        <script src="grabby.js"></script>
+        <script>
+            level = new Level(1);
+
+            let states = [level];
+
+            function main () {
+                run();
+            }
+
+            function run () {
+                n = states.length;
+                if (n) {
+                    states[n-1].draw();
+                    states[n-1].log("welp");
+                    window.requestAnimationFrame(run);
+                }
+                else {
+                    // window.close();
+                }
+            }
+
+            function down (key) {
+                if (key == " ")
+                    states.pop();
+            }
+        </script>
+    </body>
+</html>
