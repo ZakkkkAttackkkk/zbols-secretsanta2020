@@ -1,59 +1,24 @@
-class Drawable {
-    constructor (ctx, src, x, y, h, w, x_, y_, h_, w_) {
-        this.ctx = ctx;
-        this.img = Image();
-        this.img.src = src;
-        if (x_ !== undefined){
-            this.sx = x;
-            this.sy = y;
-            this.sh = h;
-            this.sw = w;
-            this.dx = x_;
-            this.dy = y_;
-            this.dh = h_;
-            this.dw = w_;
-        }
-        else {
-            this.sx = this.sy = this.sh = this.sw = undefined;
-            this.dx = x;
-            this.dy = y;
-            this.dh = h;
-            this.dw = w;
-        }
-    }
+level = new Level(1);
 
-    draw () {
-        if (this.sx !== undefined)
-            this.ctx.drawImage(
-                this.img,
-                this.sx, this.sy, this.sh, this.sw,
-                this.dx, this.dy, this.dh, this.dw);
-        else
-            this.ctx.drawImage(
-                this.img,
-                this.dx, this.dy, this.dh, this.dw);
+let states = [level];
+
+function main () {
+    run();
+}
+
+function run () {
+    n = states.length;
+    if (n) {
+        states[n-1].draw();
+        states[n-1].log("welp");
+        window.requestAnimationFrame(run);
+    }
+    else {
+        // window.close();
     }
 }
 
-class GameState {
-    constructor () {
-        this.drawables = [];
-    };
-
-    draw () {
-        for (drbl in this.drawables) {
-            drbl.draw();
-        }
-    };
-
-    log () {
-        console.log("Hello!",...arguments)
-    }
-};
-
-class Level extends GameState {
-    constructor () {
-        super();
-        this.stuff = arguments;
-    }
+function down (key) {
+    if (key == " ")
+        states.pop();
 }
