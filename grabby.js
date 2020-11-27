@@ -1,5 +1,3 @@
-level = new Level(1);
-
 let states = [level];
 
 function main () {

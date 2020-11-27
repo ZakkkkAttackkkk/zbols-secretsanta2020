@@ -49,11 +49,4 @@ class GameState {
     log () {
         console.log(this,...arguments)
     }
-};
-
-class Level extends GameState {
-    constructor () {
-        super();
-        this.stuff = arguments;
-    }
 }
