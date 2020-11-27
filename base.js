@@ -51,14 +51,15 @@ class Path extends Drawable {
     }
 
     draw () {
+        console.log("draw", this, ...arguments);
         this.ctx.save();
         this.ctx.translate(this.x, this.y);
-        if (this.fill){
-            this.ctx.fillStyle = fill;
+        if (this.fill !== null){
+            this.ctx.fillStyle = this.fill;
             this.ctx.fill(this.path);
         }
-        if (this.stroke){
-            this.ctx.strokeStyle = stroke;
+        if (this.stroke !== null){
+            this.ctx.strokeStyle = this.stroke;
             this.ctx.stroke(this.path);
         }
         this.ctx.restore();
@@ -66,7 +67,8 @@ class Path extends Drawable {
 }
 
 class GameState {
-    constructor () {
+    constructor (ctx) {
+        this.ctx = ctx;
         this.drawables = [];
         this.passDraw = false;
         this.passUpdate = false;
