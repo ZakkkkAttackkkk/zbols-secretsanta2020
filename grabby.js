@@ -1,4 +1,4 @@
-let states = [level];
+let states = [levels[0]];
 
 function main () {
     run();

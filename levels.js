@@ -14,3 +14,4 @@ class Level extends GameState {
 
 var levels = [];
 
+levels.push(new Level(5,5));
