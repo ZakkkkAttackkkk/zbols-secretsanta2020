@@ -1,7 +1,6 @@
 class Drawable {
-    constructor (ctx, style, x, y, w, h) {
+    constructor (ctx, x, y, w, h) {
         this.ctx = ctx;
-        this.style = style;
         this.x = x;
         this.y = y;
         this.w = w;
@@ -14,21 +13,22 @@ class Drawable {
 class Sprite extends Drawable {
     constructor (ctx, src, x, y, w, h, x_, y_, w_, h_) {
         if (x_ !== undefined){
-            super(ctx, null, x_, y_, w_, h_);
+            super(ctx, x_, y_, w_, h_);
             this.sx = x;
             this.sy = y;
             this.sw = w;
             this.sh = h;
         }
         else {
-            super(ctx, null, x, y, w, h);
+            super(ctx, x, y, w, h);
             this.sx = this.sy = this.sw = this.sh = undefined;
         }
-        this.style = this.img = Image();
+        this.img = Image();
         this.img.src = src;
     }
 
     draw () {
+        this.ctx.save();
         if (this.sx !== undefined)
             this.ctx.drawImage(
                 this.img,
@@ -38,15 +38,30 @@ class Sprite extends Drawable {
             this.ctx.drawImage(
                 this.img,
                 this.dx, this.dy, this.dw, this.dh);
+        this.ctx.restore();
     }
 }
 
 class Path extends Drawable {
-    constructor (ctx, style) {
-        super(ctx, style);
+    constructor (ctx, x, y, pathData, fill, stroke) {
+        super(ctx, x, y);
+        this.path = new Path2D(pathData);
+        this.fill = fill;
+        this.stroke = stroke;
     }
 
     draw () {
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        if (this.fill){
+            this.ctx.fillStyle = fill;
+            this.ctx.fill(this.path);
+        }
+        if (this.stroke){
+            this.ctx.strokeStyle = stroke;
+            this.ctx.stroke(this.path);
+        }
+        this.ctx.restore();
     }
 }
 

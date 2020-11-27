@@ -4,6 +4,13 @@ cnv = document.getElementById("cnv-main");
 ctx = cnv.getContext("2d");
 
 function main () {
+    // pth = new Path2D('M10 10 h 80 v 80 h -80 Z');
+    // ctx.stroke(pth);
+    // ctx.save();
+    // ctx.translate(40, 40);
+    // ctx.stroke(pth);
+    // ctx.restore();
+    // ctx.fill(pth);
     run();
 }
 
