@@ -20,7 +20,7 @@ class Grid  {
     }
 
     draw () {
-        console.log("draw", this, ...arguments);
+        // console.log("draw", this, ...arguments);
         for (var i in this.cells) {
             for (var j in this.cells[i]) {
                 this.cells[i][j].draw();
@@ -33,13 +33,14 @@ class Level extends GameState {
     constructor (ctx, x, y, w, h) {
         super(ctx);
         this.grid = new Grid(ctx, x, y, w, h);
-        console.log(this.grid);
+        this.drawables.push(this.grid);
+        this.drawables.push(new Sprite(ctx, "test.png", 150, 235));
     }
 
-    draw () {
-        console.log("draw", this, ...arguments);
-        this.grid.draw();
-    }
+    // draw () {
+        // console.log("draw", this, ...arguments);
+        // this.grid.draw();
+    // }
 }
 
 cnv = document.getElementById("cnv-main");

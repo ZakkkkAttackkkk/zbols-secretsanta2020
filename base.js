@@ -61,24 +61,39 @@ class Sprite extends Drawable {
             this.sh = h;
         }
         else {
-            super(ctx, x, y, w, h);
+            if (w !== undefined){
+                super(ctx, x, y, w, h);
+            }
+            else{
+                super(ctx, x, y);
+                this.w = this.h = undefined
+            }
             this.sx = this.sy = this.sw = this.sh = undefined;
         }
-        this.img = Image();
+        this.img = new Image();
         this.img.src = src;
     }
 
     draw () {
+        console.log("draw", this, ...arguments);
         this.ctx.save();
-        if (this.sx !== undefined)
+        if (this.sx !== undefined) {
             this.ctx.drawImage(
                 this.img,
                 this.sx, this.sy, this.sw, this.sh,
-                this.dx, this.dy, this.dw, this.dh);
-        else
+                this.x, this.y, this.w, this.h);
+        }
+        else if (this.w !== undefined) {
             this.ctx.drawImage(
                 this.img,
-                this.dx, this.dy, this.dw, this.dh);
+                this.x, this.y, this.w, this.h);
+        }
+        else {
+            this.ctx.drawImage(
+                this.img,
+                this.x, this.y);
+
+        }
         this.ctx.restore();
     }
 }
@@ -118,8 +133,8 @@ class GameState extends GameEventTarget{
 
     draw () {
         console.log("draw", this, ...arguments);
-        for (drbl in this.drawables) {
-            drbl.draw();
+        for (var i in this.drawables) {
+            this.drawables[i].draw();
         }
     }
 
