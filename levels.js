@@ -8,7 +8,7 @@ class Grid  {
         this.cells = [];
         var path = "M0 0l20 0l0 20l-20 0z";
         for (var r = 0; r < h; r++) {
-            this.cells.push(new Array);
+            this.cells.push([]);
             for (var c = 0; c < w; c++) {
                 this.cells[r].push(new Path(
                     ctx, x+20*c, y+20*r, path,
