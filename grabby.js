@@ -4,7 +4,7 @@ function main () {
     run();
 }
 
-function run () {
+function run (t) {
     n = states.length;
     if (n) {
         var start;
@@ -13,7 +13,7 @@ function run () {
                 break;
         }
         for (; start < n; start++){
-            states[start].update();
+            states[start].update(t);
         }
         for (start = n - 1; start >= 0; start--) {
             if (states[start].passDraw == false){

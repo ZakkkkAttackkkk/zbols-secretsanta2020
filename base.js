@@ -1,3 +1,7 @@
+class Animation {
+    ;
+}
+
 class GameEventTarget {
     constructor () {
         this.passKeyDown = false;
@@ -138,7 +142,7 @@ class GameState extends GameEventTarget{
         }
     }
 
-    update () {
+    update (t) {
         console.log("update", this, ...arguments);
     }
 
