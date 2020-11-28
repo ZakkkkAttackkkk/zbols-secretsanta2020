@@ -1,12 +1,10 @@
-class Player extends Drawable {
+class Item extends Drawable {
     constructor (ctx, x, y, len, gx, gy) {
         super(ctx, x, y)
         this.len = len;
         this._gx = gx;
         this._gy = gy;
-        var path = "M5 40a35 35 0 1 1 0 1Z"
-        // var path = "M40 5L75 75L5 75Z"
-        this.body = new Path(ctx, x+len*gx, y+len*gy, path, "#000", null);
+        this.drawables = []; 
     }
 
     get gx () {
@@ -28,7 +26,19 @@ class Player extends Drawable {
     }
 
     draw () {
-        this.body.draw();
+        for (var i in this.drawables) {
+            this.drawables[i].draw();
+        }
+    }
+}
+
+class Player extends Item {
+    constructor (ctx, x, y, len, gx, gy) {
+        super(ctx, x, y, len, gx, gy);
+        var path = "M5 40a35 35 0 1 1 0 1Z"
+        this.body = new Path(ctx, x+len*gx, y+len*gy, path, "#000", null);
+
+        this.drawables = [this.body];
     }
 }
 
