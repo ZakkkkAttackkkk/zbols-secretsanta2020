@@ -46,10 +46,42 @@ class GameEventTarget {
 class Drawable {
     constructor (ctx, x, y, w, h) {
         this.ctx = ctx;
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+        this._x = x;
+        this._y = y;
+        this._w = w;
+        this._h = h;
+    }
+
+    get x () {
+        return this._x;
+    }
+
+    set x (value) {
+        this._x = value;
+    }
+
+    get y () {
+        return this._y;
+    }
+
+    set y (value) {
+        this._y = value;
+    }
+
+    get w () {
+        return this._w;
+    }
+
+    set w (value) {
+        this._w = value;
+    }
+
+    get h () {
+        return this._h;
+    }
+
+    set h (value) {
+        this._h = value;
     }
 
     draw () {}
@@ -59,10 +91,10 @@ class Sprite extends Drawable {
     constructor (ctx, src, x, y, w, h, x_, y_, w_, h_) {
         if (x_ !== undefined){
             super(ctx, x_, y_, w_, h_);
-            this.sx = x;
-            this.sy = y;
-            this.sw = w;
-            this.sh = h;
+            this._sx = x;
+            this._sy = y;
+            this._sw = w;
+            this._sh = h;
         }
         else {
             if (w !== undefined){
@@ -72,14 +104,46 @@ class Sprite extends Drawable {
                 super(ctx, x, y);
                 this.w = this.h = undefined
             }
-            this.sx = this.sy = this.sw = this.sh = undefined;
+            this._sx = this._sy = this._sw = this._sh = undefined;
         }
         this.img = new Image();
         this.img.src = src;
     }
 
+    get sx () {
+        return this._sx;
+    }
+
+    set sx (value) {
+        this._sx = value;
+    }
+
+    get sy () {
+        return this._sy;
+    }
+
+    set sy (value) {
+        this._sy = value;
+    }
+
+    get sw () {
+        return this._sw;
+    }
+
+    set sw (value) {
+        this._sw = value;
+    }
+
+    get sh () {
+        return this._sh;
+    }
+
+    set sh (value) {
+        this._sh = value;
+    }
+
     draw () {
-        console.log("draw", this, ...arguments);
+        // console.log("draw", this, ...arguments);
         this.ctx.save();
         if (this.sx !== undefined) {
             this.ctx.drawImage(
@@ -111,7 +175,7 @@ class Path extends Drawable {
     }
 
     draw () {
-        console.log("draw", this, ...arguments);
+        // console.log("draw", this, ...arguments);
         this.ctx.save();
         this.ctx.translate(this.x, this.y);
         if (this.fill !== null){
@@ -136,17 +200,17 @@ class GameState extends GameEventTarget{
     }
 
     draw () {
-        console.log("draw", this, ...arguments);
+        // console.log("draw", this, ...arguments);
         for (var i in this.drawables) {
             this.drawables[i].draw();
         }
     }
 
     update (t) {
-        console.log("update", this, ...arguments);
+        // console.log("update", this, ...arguments);
     }
 
     log () {
-        console.log("log", this, ...arguments);
+        // console.log("log", this, ...arguments);
     }
 }
