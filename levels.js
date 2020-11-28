@@ -1,6 +1,6 @@
-class Item extends Drawable {
+class Item extends DrawableGroup {
     constructor (ctx, x, y, len, gx, gy) {
-        super(ctx, x, y)
+        super(ctx, x, y);
         this.len = len;
         this._gx = gx;
         this._gy = gy;
@@ -23,12 +23,6 @@ class Item extends Drawable {
     set gy (value) {
         this._gy = value;
         this.body.y = this.y + this._gy * this.len;
-    }
-
-    draw () {
-        for (var i in this.drawables) {
-            this.drawables[i].draw();
-        }
     }
 }
 

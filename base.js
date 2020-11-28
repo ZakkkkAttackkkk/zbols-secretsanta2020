@@ -87,6 +87,24 @@ class Drawable {
     draw () {}
 }
 
+class DrawableGroup {
+    constructor (ctx, x, y) {
+        this.ctx = ctx;
+        this.x = x;
+        this.y = y;
+        this.drawables = [];
+    }
+
+    draw () {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.drawables.forEach((drbl) => {
+            drbl.draw();
+        })
+        this.ctx.restore();
+    }
+}
+
 class Sprite extends Drawable {
     constructor (ctx, src, x, y, w, h, x_, y_, w_, h_) {
         if (x_ !== undefined){
