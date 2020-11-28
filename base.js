@@ -2,7 +2,7 @@ class Animation {
     ;
 }
 
-class GameEventTarget {
+const GameEventTarget = {
     constructor () {
         this.passKeyDown = false;
         this.passKeyUp = false;
@@ -10,32 +10,32 @@ class GameEventTarget {
         this.passMouseDown = false;
         this.passMouseUp = false;
         this.passMousePress = false;
-    }
+    },
 
     keydown (ev) {
         console.log("keydown", this, ...arguments);
         return this.passKeyDown;
-    }
+    },
 
     keyup (ev) {
         console.log("keyup", this, ...arguments);
         return this.passKeyUp;
-    }
+    },
 
     keypress (ev) {
         console.log("keypress", this, ...arguments);
         return this.passKeyPress;
-    }
+    },
     
     mousedown (ev) {
         console.log("mousedown", this, ...arguments);
         return this.passMouseDown;
-    }
+    },
 
     mouseup (ev) {
         console.log("mouseup", this, ...arguments);
         return this.passMouseUp;
-    }
+    },
 
     mousepress (ev) {
         console.log("mousepress", this, ...arguments);
@@ -97,7 +97,7 @@ class DrawableGroup {
 
     draw () {
         this.ctx.save();
-        this.ctx.translate(x, y);
+        this.ctx.translate(this.x, this.y);
         this.drawables.forEach((drbl) => {
             drbl.draw();
         })
@@ -208,7 +208,7 @@ class Path extends Drawable {
     }
 }
 
-class GameState extends GameEventTarget{
+class GameState extends DrawableGroup{
     constructor (ctx) {
         super();
         this.ctx = ctx;
@@ -232,3 +232,4 @@ class GameState extends GameEventTarget{
         // console.log("log", this, ...arguments);
     }
 }
+Object.assign(GameState.prototype, GameEventTarget);

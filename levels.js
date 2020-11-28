@@ -36,11 +36,9 @@ class Player extends Item {
     }
 }
 
-class Grid {
+class Grid extends DrawableGroup {
     constructor (ctx, x, y, len, w, h) {
-        this.ctx = ctx;
-        this.x = x;
-        this.y = y;
+        super(ctx, x, y);
         this.len = len;
         this.w = w;
         this.h = h;
@@ -55,15 +53,7 @@ class Grid {
                     "#0003"
                 ));
             }
-        }
-    }
-
-    draw () {
-        // console.log("draw", this, ...arguments);
-        for (var i in this.cells) {
-            for (var j in this.cells[i]) {
-                this.cells[i][j].draw();
-            }
+            this.drawables.push(...this.cells[r]);
         }
     }
 }
