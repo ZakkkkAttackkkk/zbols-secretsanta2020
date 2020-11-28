@@ -1,13 +1,6 @@
 let states = [levels[0]];
 
 function main () {
-    // pth = new Path2D('M10 10h80v80h-80Z');
-    // ctx.stroke(pth);
-    // ctx.save();
-    // ctx.translate(40, 40);
-    // ctx.stroke(pth);
-    // ctx.restore();
-    // ctx.fill(pth);
     run();
 }
 
@@ -37,7 +30,7 @@ function run () {
     }
 }
 
-function down (ev) {
+document.body.onkeydown = function keydown (ev) {
     if (ev.key == " ")
         states.pop();
     for (start = states.length - 1; start >= 0; start--) {
@@ -46,16 +39,37 @@ function down (ev) {
     }
 }
 
-function up (ev) {
+document.body.onkeyup = function keyup (ev) {
     for (start = states.length - 1; start >= 0; start--) {
         if (states[start].keyup(ev) == false)
             break;
     }
 }
 
-function press (ev) {
+document.body.onkeypress = function keypress (ev) {
     for (start = states.length - 1; start >= 0; start--) {
         if (states[start].keypress(ev) == false)
+            break;
+    }
+}
+
+cnv.onmousedown = function mousedown (ev) {
+    for (start = states.length - 1; start >= 0; start--) {
+        if (states[start].mousedown(ev) == false)
+            break;
+    }
+}
+
+cnv.onmouseup = function mouseup (ev) {
+    for (start = states.length - 1; start >= 0; start--) {
+        if (states[start].mouseup(ev) == false)
+            break;
+    }
+}
+
+cnv.onmousepress = function mousepress (ev) {
+    for (start = states.length - 1; start >= 0; start--) {
+        if (states[start].mousepress(ev) == false)
             break;
     }
 }

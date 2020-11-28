@@ -1,3 +1,44 @@
+class GameEventTarget {
+    constructor () {
+        this.passKeyDown = false;
+        this.passKeyUp = false;
+        this.passKeyPress = false;
+        this.passMouseDown = false;
+        this.passMouseUp = false;
+        this.passMousePress = false;
+    }
+
+    keydown (ev) {
+        console.log("keydown", this, ...arguments);
+        return this.passKeyDown;
+    }
+
+    keyup (ev) {
+        console.log("keyup", this, ...arguments);
+        return this.passKeyUp;
+    }
+
+    keypress (ev) {
+        console.log("keypress", this, ...arguments);
+        return this.passKeyPress;
+    }
+    
+    mousedown (ev) {
+        console.log("mousedown", this, ...arguments);
+        return this.passMouseDown;
+    }
+
+    mouseup (ev) {
+        console.log("mouseup", this, ...arguments);
+        return this.passMouseUp;
+    }
+
+    mousepress (ev) {
+        console.log("mousepress", this, ...arguments);
+        return this.passMousePress;
+    }
+}
+
 class Drawable {
     constructor (ctx, x, y, w, h) {
         this.ctx = ctx;
@@ -66,8 +107,9 @@ class Path extends Drawable {
     }
 }
 
-class GameState {
+class GameState extends GameEventTarget{
     constructor (ctx) {
+        super();
         this.ctx = ctx;
         this.drawables = [];
         this.passDraw = false;
@@ -87,20 +129,5 @@ class GameState {
 
     log () {
         console.log("log", this, ...arguments);
-    }
-
-    keydown (ev) {
-        console.log("keydown", this, ...arguments);
-        return false;
-    }
-
-    keyup (ev) {
-        console.log("keyup", this, ...arguments);
-        return false;
-    }
-
-    keypress (ev) {
-        console.log("keypress", this, ...arguments);
-        return false;
     }
 }
