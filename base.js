@@ -208,7 +208,7 @@ class Path extends Drawable {
     }
 }
 
-class GameState extends DrawableGroup{
+class GameState extends DrawableGroup {
     constructor (ctx) {
         super();
         this.ctx = ctx;
