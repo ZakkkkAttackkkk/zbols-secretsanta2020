@@ -29,10 +29,10 @@ class Item extends DrawableGroup {
 class Player extends Item {
     constructor (ctx, x, y, len, gx, gy) {
         super(ctx, x, y, len, gx, gy);
-        var path = "M5 40a35 35 0 1 1 0 1Z"
-        this.body = new Path(ctx, x+len*gx, y+len*gy, path, "#000", null);
-
+        var path = "m10-40a30 30 0 1 1 0 1Z"
+        this.body = new Path(ctx, x+len*gx, y+len*gy, path, "purple", null);
         this.drawables = [this.body];
+        ;
     }
 }
 
@@ -50,7 +50,7 @@ class Grid extends DrawableGroup {
                 this.cells[r].push(new Path(
                     ctx, x+len*c, y+len*r, path,
                     (r+c)&1 ? "#aaa" : "#777",
-                    "#0003"
+                    null
                 ));
             }
             this.drawables.push(...this.cells[r]);
@@ -62,7 +62,7 @@ class Level extends GameState {
     constructor (ctx, x, y, len, w, h, px, py) {
         super(ctx);
         this.grid = new Grid(ctx, x, y, len, w, h);
-        this.player = new Player(ctx, x, y, len, px, py);
+        this.player = new Player(ctx, x+len/2, y+len/2, len, px, py);
         this.drawables = [this.grid, this.player];
     }
 
