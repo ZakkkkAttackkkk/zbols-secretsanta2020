@@ -13,7 +13,9 @@ class Item extends DrawableGroup {
 
     set gx (value) {
         this._gx = value;
-        this.body.x = this.x + this._gx * this.len;
+        this.drawables.forEach((drbl)=>{
+            drbl.x = this.x + this._gx * this.len;
+        })
     }
 
     get gy () {
@@ -22,7 +24,9 @@ class Item extends DrawableGroup {
 
     set gy (value) {
         this._gy = value;
-        this.body.y = this.y + this._gy * this.len;
+        this.drawables.forEach((drbl)=>{
+            drbl.y = this.y + this._gy * this.len;
+        })
     }
 }
 
@@ -95,4 +99,4 @@ ctx = cnv.getContext("2d");
 
 var levels = [];
 
-levels.push(new Level(ctx,0,0,80,10,7,3,5));
+levels.push(new Level(ctx,0,0,80,10,7,0,0));
