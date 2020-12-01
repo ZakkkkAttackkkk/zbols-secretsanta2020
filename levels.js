@@ -14,7 +14,7 @@ class Item extends DrawableGroup {
     set gx (value) {
         this._gx = value;
         this.drawables.forEach((drbl)=>{
-            drbl.x = this.x + this._gx * this.len;
+            drbl.x = this._gx * this.len;
         })
     }
 
@@ -25,7 +25,7 @@ class Item extends DrawableGroup {
     set gy (value) {
         this._gy = value;
         this.drawables.forEach((drbl)=>{
-            drbl.y = this.y + this._gy * this.len;
+            drbl.y = this._gy * this.len;
         })
     }
 }
@@ -33,8 +33,8 @@ class Item extends DrawableGroup {
 class Player extends Item {
     constructor (ctx, x, y, len, gx, gy) {
         super(ctx, x, y, len, gx, gy);
-        var path = "m10-40a30 30 0 1 1 0 1Z"
-        this.body = new Path(ctx, x+len*gx, y+len*gy, path, "purple", null);
+        var path = "m0-30a30 30 0 1 1 0 60a30 30 0 1 1 0-60";
+        this.body = new Path(ctx, len*gx, len*gy, path, "purple", null);
         this.drawables = [this.body];
         ;
     }
@@ -65,6 +65,8 @@ class Grid extends DrawableGroup {
 class Level extends GameState {
     constructor (ctx, x, y, len, w, h, px, py) {
         super(ctx);
+        delete this.x;
+        delete this.y;
         this.grid = new Grid(ctx, x, y, len, w, h);
         this.player = new Player(ctx, x+len/2, y+len/2, len, px, py);
         this.drawables = [this.grid, this.player];
@@ -99,4 +101,4 @@ ctx = cnv.getContext("2d");
 
 var levels = [];
 
-levels.push(new Level(ctx,0,0,80,10,7,0,0));
+levels.push(new Level(ctx,0,0,80,10,7,3,5));
