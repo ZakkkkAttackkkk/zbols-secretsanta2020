@@ -1,3 +1,55 @@
+function bisect (arr, el) {
+    var a = 0, z = arr.length, m = 0;
+    while (a < z) {
+        m = (a+z)/2;
+        if (arr[m] == el) break;
+        if (arr[m] < el) a = m;
+        else a = m;
+    }
+    return m;
+}
+
+class Trie {
+    constructor () {
+        this.data = undefined;
+        this.keys = [];
+        this.values = [];
+    }
+
+    set (key, data) {
+        console.log("set",this,key,data);
+        if (key.length == 0) {
+            this.data = data;
+        }
+        else {
+            var k, ey;
+            [k, ...ey] = key;
+            var ind = bisect(this.keys, k);
+            if (this.keys[ind] != k || this.keys[ind] == undefined) {
+                this.keys.splice(ind,0,k);
+                this.values.splice(ind,0,new Trie());
+            }
+            console.log(ind,this.keys,this.values);
+            this.values[ind].set(ey, data);
+        }
+    }
+
+    get (key) {
+        if (key.length == 0) {
+            return this.data;
+        }
+        else {
+            var k, ey;
+            [k, ...ey] = key;
+            var ind = bisect(this.keys, k);
+            if (this.keys[ind] != k || this.keys[ind] == undefined) {
+                return undefined;
+            }
+            return this.values[ind].get(ey);
+        }
+    }
+}
+
 class Animation {
     ;
 }
