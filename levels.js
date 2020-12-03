@@ -52,7 +52,7 @@ class Grid extends DrawableGroup {
             this.cells.push([]);
             for (var c = 0; c < w; c++) {
                 this.cells[r].push(new Path(
-                    ctx, x+len*c, y+len*r, path,
+                    ctx, len*c, len*r, path,
                     (r+c)&1 ? "#aaa" : "#777",
                     null
                 ));
