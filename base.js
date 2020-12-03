@@ -1,12 +1,12 @@
 function bisect (arr, el) {
-    var a = 0, z = arr.length, m = 0;
+    var a = 0, z = arr.length, m = -1;
     while (a < z) {
         m = Math.floor((a+z)/2);
-        if (arr[m] == el) return m-1;
+        if (arr[m] == el) return m;
         if (arr[m] < el) a = m + 1;
         else z = m;
     }
-    return m;
+    return m+1;
 }
 
 class Trie {
