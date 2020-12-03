@@ -42,12 +42,12 @@ class Player extends Item {
             new Path(ctx, len*gx, len*gy, "m0 0h130", null, "purple"),
         ];
         this.grabItems = [null, null, null, null, null, null, null, null];
-        this.startAngle = 0;
+        this.startAngle = 3;
         this.drawables = [this.body, ...this.legs];
     }
 
     draw () {
-        for (var angle = (this.startAngle + 3) * 8 / 4 * Math.PI , i = 0;
+        for (var angle = this.startAngle % 8 / 4 * Math.PI , i = 0;
             i < 8;
             angle -= Math.PI/4, i++){
             this.ctx.save();
