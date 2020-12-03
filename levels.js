@@ -117,6 +117,26 @@ class Level extends GameState {
                 this.player.gy++;
             }
         }
+        else if (ev.code === "KeyS") {
+            this.player.startAngle = (this.player.startAngle + 7) % 8
+        }
+        else if (ev.code === "KeyF") {
+            this.player.startAngle = (this.player.startAngle + 1) % 8
+        }
+        else {
+            for (var i = 0; i < 8; i++){
+                if (ev.code === "Key" + "DEWQAZXC"[i]) {
+                    var ind = (this.player.startAngle + i) % 8;
+                    if (this.player.grabItems[ind] === null){
+                        this.player.grabItems[ind] = true;
+                    }
+                    else {
+                        this.player.grabItems[ind] = null;
+                    }
+                    break;
+                }
+            }
+        }
     }
 }
 
