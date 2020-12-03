@@ -1,10 +1,10 @@
 function bisect (arr, el) {
     var a = 0, z = arr.length, m = 0;
     while (a < z) {
-        m = (a+z)/2;
-        if (arr[m] == el) break;
-        if (arr[m] < el) a = m;
-        else a = m;
+        m = Math.floor((a+z)/2);
+        if (arr[m] == el) return m-1;
+        if (arr[m] < el) a = m + 1;
+        else z = m;
     }
     return m;
 }
@@ -17,7 +17,6 @@ class Trie {
     }
 
     set (key, data) {
-        console.log("set",this,key,data);
         if (key.length == 0) {
             this.data = data;
         }
@@ -29,7 +28,6 @@ class Trie {
                 this.keys.splice(ind,0,k);
                 this.values.splice(ind,0,new Trie());
             }
-            console.log(ind,this.keys,this.values);
             this.values[ind].set(ey, data);
         }
     }
@@ -47,6 +45,13 @@ class Trie {
             }
             return this.values[ind].get(ey);
         }
+    }
+
+    forEach (fn) {
+        if (this.data !== undefined) fn(this.data);
+        this.values.forEach((trie) => {
+            trie.forEach(fn);
+        })
     }
 }
 
