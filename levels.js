@@ -1,10 +1,10 @@
 class Item extends DrawableGroup {
-    constructor (ctx, x, y, len, gx, gy, grab, pass) {
+    constructor (ctx, x, y, len, gx, gy, grab, pass, ...drbls) {
         super(ctx, x, y);
         this.len = len;
         this._gx = gx;
         this._gy = gy;
-        this.drawables = [];
+        this.drawables = drbls;
         this.grabbable = grab;
         this.passable = pass;
     }
@@ -29,6 +29,18 @@ class Item extends DrawableGroup {
         this.drawables.forEach((drbl)=>{
             drbl.y = this._gy * this.len;
         })
+    }
+}
+
+class Wall extends Item {
+    constructor (ctx, x, y, len, gx, gy, ...drbls) {
+        super(ctx, x, y, len, gx, gy, false, false, ...drbls);
+    }
+}
+
+class Floor extends Item {
+    constructor (ctx, x, y, len, gx, gy, ...drbls) {
+        super(ctx, x, y, len, gx, gy, false, true, ...drbls);
     }
 }
 
@@ -67,21 +79,84 @@ class Grid extends DrawableGroup {
     constructor (ctx, x, y, len, w, h) {
         super(ctx, x, y);
         this.len = len;
-        this.w = w;
-        this.h = h;
-        this.cells = [];
-        var path = ["M0 0h","v","h-","z"].join(len);
-        for (var r = 0; r < h; r++) {
-            this.cells.push([]);
-            for (var c = 0; c < w; c++) {
-                this.cells[r].push(new Path(
-                    ctx, len*c, len*r, path,
-                    (r+c)&1 ? "#aaa" : "#777",
-                    null
-                ));
+        this.cells = new Trie();
+        this.drawables = this.cells;
+    }
+
+    register (map, list) {
+        for (var r = 0; r < map.length; r++) {
+            var row = map[r];
+            for (var c = 0; c < row.length; c++) {
+                if (row[c] !== null){
+                    var cell = [];
+                    row[c].forEach((el)=>{
+                        var [itm, drbls] = list.get(el);
+                        var item = new (itm)(
+                            this.ctx, this.x, this.y,
+                            this.len, c, r
+                        );
+                        drbls.forEach((drbl)=>{
+                            var [func, spec, ...args] = drbl;
+                            if (func == "P") {
+                                item.drawables.push(new Path(
+                                    this.ctx, this.len * c, this.len * r,
+                                    spec(this.len), ...args
+                                ));
+                            }
+                            else if (func == "S") {
+                                item.drawables.push(new Sprite(
+                                    this.ctx, spec, 
+                                    this.len * c, this.len * r, ...args
+                                ));
+                            }
+                        })
+                        cell.push(item);
+                    })
+                    this.cells.set([r, c], cell);
+                }
             }
-            this.drawables.push(...this.cells[r]);
         }
+        console.log(this.cells);
+    }
+
+    // Check if the cell at the given position is passable
+    passable (pos) {
+        var x, y;
+        [x, y] = pos;
+        var cell = this.cells.get([y,x]);
+        console.log(...pos, cell, this.cells);
+        if (cell === undefined) return false;
+        return !(cell.some((item) => item.passable == false));
+    }
+
+    // Check if the player collides with anything that isn't passable
+    collide (dx, dy, player) {
+        console.log("pl test");
+        if (!this.passable([player.gx+dx, player.gy+dy])) return true;
+        console.log("pl good");
+        var dirs = [
+            [1,0], [1,1], [0,1], [-1,1],
+            [-1,0], [-1,-1], [0,-1], [1,-1]
+        ], x, y;
+        for (var i = 0; i < 8 ; i++) {
+            if (player.grabItems[i] === null) continue;
+            [x, y] = dirs[(player.startAngle + i) % 8];
+            if (!this.passable([player.gx+x+dx, player.gy+y+dy])){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    draw () {
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        this.cells.forEach((cell) => {
+            cell.forEach((drbl) => {
+                drbl.draw();
+            })
+        });
+        this.ctx.restore();
     }
 }
 
@@ -92,28 +167,27 @@ class Level extends GameState {
         delete this.y;
         this.grid = new Grid(ctx, x, y, len, w, h);
         this.player = new Player(ctx, x+len/2, y+len/2, len, px, py);
-        this.items = [];
-        this.drawables = [this.grid, this.player, ...this.items];
+        this.drawables = [this.grid, this.player];
     }
 
     keydown (ev) {
         if (ev.code === "ArrowLeft") {
-            if (0 < this.player.gx){
+            if (!this.grid.collide(-1, 0, this.player)){
                 this.player.gx--;
             }
         }
         else if (ev.code === "ArrowRight") {
-            if (this.player.gx < this.grid.w - 1){
+            if (!this.grid.collide(1, 0, this.player)){
                 this.player.gx++;
             }
         }
         else if (ev.code === "ArrowUp") {
-            if (0 < this.player.gy){
+            if (!this.grid.collide(0, -1, this.player)){
                 this.player.gy--;
             }
         }
         else if (ev.code === "ArrowDown") {
-            if (this.player.gy < this.grid.h - 1){
+            if (!this.grid.collide(0, 1, this.player)){
                 this.player.gy++;
             }
         }
@@ -145,4 +219,29 @@ ctx = cnv.getContext("2d");
 
 var levels = [];
 
-levels.push(new Level(ctx,0,0,80,10,7,3,5));
+itemList = new Map([
+    [
+        "FL0", [Floor, [
+            ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#aaa", null],
+        ]]
+    ],
+    [
+        "FL1", [Floor, [
+            ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
+        ]]
+    ],
+    [
+        "WL0", [Wall, [
+            ["P", (len)=>["m0 0h","v","h-","z"].join(len), "#aad", null],
+            ["P", (len)=>["m10 10h","v","h-","z"].join(len-20), "#77a", null],
+        ]]
+    ],
+])
+maps = [
+    [ // Level 0
+        [["FL1"],null,["FL1"],["FL0"],["FL1"],["FL0"],["WL0"],],
+        [["FL0"],["FL1"],["FL0"],["FL1"],["FL0"],["FL1"],["FL0"],],
+    ]
+]
+levels.push(new Level(ctx,0,0,80,10,7,3,0));
+levels[0].grid.register(maps[0],itemList);
