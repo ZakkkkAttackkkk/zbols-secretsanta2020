@@ -194,8 +194,17 @@ class Path extends Drawable {
 
     draw () {
         // console.log("draw", this, ...arguments);
+        var mat = this.ctx.getTransform();
         this.ctx.save();
+        this.ctx.setTransform(
+            1, 0, 0, 
+            1, 0, 0
+        );
         this.ctx.translate(this.x, this.y);
+        this.ctx.transform(
+            mat.a, mat.b, mat.c,
+            mat.d, mat.e, mat.f
+        );
         if (this.fill !== null){
             this.ctx.fillStyle = this.fill;
             this.ctx.fill(this.path);
