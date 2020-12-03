@@ -35,8 +35,29 @@ class Player extends Item {
         super(ctx, x, y, len, gx, gy);
         var path = "m0-30a30 30 0 1 1 0 60a30 30 0 1 1 0-60";
         this.body = new Path(ctx, len*gx, len*gy, path, "purple", null);
-        this.drawables = [this.body];
-        ;
+        this.legs = [
+            new Path(ctx, len*gx, len*gy, "m0 0h50", null, "purple"),
+            new Path(ctx, len*gx, len*gy, "m0 0h130", null, "purple"),
+        ];
+        this.grabItems = [null, null, null, null, null, null, null, null];
+        this.startAngle = 0;
+        this.drawables = [this.body, ...this.legs];
+    }
+
+    draw () {
+        for (var angle = (this.startAngle + 3) * 8 / 4 * Math.PI , i = 0;
+            i < 8;
+            angle -= Math.PI/4, i++){
+            this.ctx.save();
+            this.ctx.translate(this.x, this.y);
+            this.ctx.rotate(angle);
+            this.legs[this.grabItems[i]===null?0:1].draw();
+            this.ctx.restore();
+        }
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        this.body.draw();
+        this.ctx.restore();
     }
 }
 
