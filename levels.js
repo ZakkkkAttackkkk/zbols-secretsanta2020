@@ -1,10 +1,12 @@
 class Item extends DrawableGroup {
-    constructor (ctx, x, y, len, gx, gy) {
+    constructor (ctx, x, y, len, gx, gy, grab, pass) {
         super(ctx, x, y);
         this.len = len;
         this._gx = gx;
         this._gy = gy;
-        this.drawables = []; 
+        this.drawables = [];
+        this.grabbable = grab;
+        this.passable = pass;
     }
 
     get gx () {
@@ -32,7 +34,7 @@ class Item extends DrawableGroup {
 
 class Player extends Item {
     constructor (ctx, x, y, len, gx, gy) {
-        super(ctx, x, y, len, gx, gy);
+        super(ctx, x, y, len, gx, gy, false, true);
         var path = "m0-30a30 30 0 1 1 0 60a30 30 0 1 1 0-60";
         this.body = new Path(ctx, len*gx, len*gy, path, "purple", null);
         this.legs = [
@@ -90,7 +92,8 @@ class Level extends GameState {
         delete this.y;
         this.grid = new Grid(ctx, x, y, len, w, h);
         this.player = new Player(ctx, x+len/2, y+len/2, len, px, py);
-        this.drawables = [this.grid, this.player];
+        this.items = [];
+        this.drawables = [this.grid, this.player, ...this.items];
     }
 
     keydown (ev) {
