@@ -108,12 +108,18 @@ class Grid extends DrawableGroup {
         }
     }
 
+    // Check if the cell at the given position is grabbable
+    grabbable (pos) {
+        var [x, y] = pos;
+        var cell = this.cells.get([y,x]);
+        if (cell === undefined) return false;
+        return cell[cell.length - 1].grabbable;
+    }
+
     // Check if the cell at the given position is passable
     passable (pos) {
-        var x, y;
-        [x, y] = pos;
+        var [x, y] = pos;
         var cell = this.cells.get([y,x]);
-        console.log(...pos, cell, this.cells);
         if (cell === undefined) return false;
         return !(cell.some((item) => item.passable == false));
     }
@@ -199,7 +205,7 @@ class Level extends GameState {
                             [-1,0], [-1,-1], [0,-1], [1,-1]
                         ];
                         var [x,y] = dirs[i];
-                        if (this.grid.passable([
+                        if (this.grid.grabbable([
                             this.player.gx+x,
                             this.player.gy+y
                         ])){
