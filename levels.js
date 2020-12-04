@@ -61,7 +61,7 @@ class Player extends Item {
     draw () {
         for (var angle = this.startAngle % 8 / 4 * Math.PI , i = 0;
             i < 8;
-            angle -= Math.PI/4, i++){
+            angle += Math.PI/4, i++){
             this.ctx.save();
             this.ctx.translate(this.x, this.y);
             this.ctx.rotate(angle);
@@ -116,7 +116,6 @@ class Grid extends DrawableGroup {
                 }
             }
         }
-        console.log(this.cells);
     }
 
     // Check if the cell at the given position is passable
@@ -130,18 +129,19 @@ class Grid extends DrawableGroup {
     }
 
     // Check if the player collides with anything that isn't passable
-    collide (dx, dy, player) {
-        console.log("pl test");
-        if (!this.passable([player.gx+dx, player.gy+dy])) return true;
-        console.log("pl good");
+    collide (dx, dy, rot, player) {
+        if (rot == 0 && !this.passable([player.gx+dx, player.gy+dy])) {
+            return true;
+        }
         var dirs = [
-            [1,0], [1,1], [0,1], [-1,1],
+            [1,0], [1,1], [0,1], [-1,1], 
             [-1,0], [-1,-1], [0,-1], [1,-1]
-        ], x, y;
+        ], x, y, ind;
         for (var i = 0; i < 8 ; i++) {
             if (player.grabItems[i] === null) continue;
-            [x, y] = dirs[(player.startAngle + i) % 8];
-            if (!this.passable([player.gx+x+dx, player.gy+y+dy])){
+            ind = rot == 0 ? - i : rot + i;
+            [x, y] = dirs[(8 + player.startAngle + ind) % 8];
+            if (!this.passable([player.gx+x+dx, player.gy+y+dy])) {
                 return true;
             }
         }
@@ -163,8 +163,6 @@ class Grid extends DrawableGroup {
 class Level extends GameState {
     constructor (ctx, x, y, len, w, h, px, py) {
         super(ctx);
-        delete this.x;
-        delete this.y;
         this.grid = new Grid(ctx, x, y, len, w, h);
         this.player = new Player(ctx, x+len/2, y+len/2, len, px, py);
         this.drawables = [this.grid, this.player];
@@ -172,37 +170,51 @@ class Level extends GameState {
 
     keydown (ev) {
         if (ev.code === "ArrowLeft") {
-            if (!this.grid.collide(-1, 0, this.player)){
+            if (!this.grid.collide(-1, 0, 0, this.player)){
                 this.player.gx--;
             }
         }
         else if (ev.code === "ArrowRight") {
-            if (!this.grid.collide(1, 0, this.player)){
+            if (!this.grid.collide(1, 0, 0, this.player)){
                 this.player.gx++;
             }
         }
         else if (ev.code === "ArrowUp") {
-            if (!this.grid.collide(0, -1, this.player)){
+            if (!this.grid.collide(0, -1, 0, this.player)){
                 this.player.gy--;
             }
         }
         else if (ev.code === "ArrowDown") {
-            if (!this.grid.collide(0, 1, this.player)){
+            if (!this.grid.collide(0, 1, 0, this.player)){
                 this.player.gy++;
             }
         }
         else if (ev.code === "KeyS") {
-            this.player.startAngle = (this.player.startAngle + 7) % 8
+            if (!this.grid.collide(0, 0, -1, this.player)){
+                this.player.startAngle = (this.player.startAngle + 7) % 8
+            }
         }
         else if (ev.code === "KeyF") {
-            this.player.startAngle = (this.player.startAngle + 1) % 8
+            if (!this.grid.collide(0, 0, 1, this.player)){
+                this.player.startAngle = (this.player.startAngle + 1) % 8
+            }
         }
         else {
             for (var i = 0; i < 8; i++){
-                if (ev.code === "Key" + "DEWQAZXC"[i]) {
-                    var ind = (this.player.startAngle + i) % 8;
+                if (ev.code === "Key" + "DCXZAQWE"[i]) {
+                    var ind = (8 + i - this.player.startAngle) % 8;
                     if (this.player.grabItems[ind] === null){
-                        this.player.grabItems[ind] = true;
+                        var dirs = [
+                            [1,0], [1,1], [0,1], [-1,1], 
+                            [-1,0], [-1,-1], [0,-1], [1,-1]
+                        ];
+                        var [x,y] = dirs[i];
+                        if (this.grid.passable([
+                            this.player.gx+x,
+                            this.player.gy+y
+                        ])){
+                            this.player.grabItems[ind] = true;
+                        }
                     }
                     else {
                         this.player.grabItems[ind] = null;
@@ -211,6 +223,8 @@ class Level extends GameState {
                 }
             }
         }
+        console.log(this.player.startAngle, this.player.grabItems);
+        return false;
     }
 }
 
@@ -239,8 +253,10 @@ itemList = new Map([
 ])
 maps = [
     [ // Level 0
-        [["FL1"],null,["FL1"],["FL0"],["FL1"],["FL0"],["WL0"],],
-        [["FL0"],["FL1"],["FL0"],["FL1"],["FL0"],["FL1"],["FL0"],],
+        [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
+        [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
+        [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     ]
 ]
 levels.push(new Level(ctx,0,0,80,10,7,3,0));
