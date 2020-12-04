@@ -286,18 +286,10 @@ class Path extends Drawable {
 
 class GameState extends DrawableGroup {
     constructor (ctx) {
-        super();
-        this.ctx = ctx;
+        super(ctx);
         this.drawables = [];
         this.passDraw = false;
         this.passUpdate = false;
-    }
-
-    draw () {
-        // console.log("draw", this, ...arguments);
-        for (var i in this.drawables) {
-            this.drawables[i].draw();
-        }
     }
 
     update (t) {
