@@ -108,25 +108,31 @@ class Grid extends DrawableGroup {
         }
     }
 
+    pop (r, c) {
+        return this.cells.get([r, c]).pop();
+    }
+
+    push (r, c, itm) {
+        return this.cells.get([r, c]).push(itm);
+    }
+
     // Check if the cell at the given position is grabbable
-    grabbable (pos) {
-        var [x, y] = pos;
-        var cell = this.cells.get([y,x]);
+    grabbable (r, c) {
+        var cell = this.cells.get([r, c]);
         if (cell === undefined) return false;
         return cell[cell.length - 1].grabbable;
     }
 
     // Check if the cell at the given position is passable
-    passable (pos) {
-        var [x, y] = pos;
-        var cell = this.cells.get([y,x]);
+    passable (r, c) {
+        var cell = this.cells.get([r, c]);
         if (cell === undefined) return false;
         return !(cell.some((item) => item.passable == false));
     }
 
     // Check if the player collides with anything that isn't passable
     collide (dx, dy, rot, player) {
-        if (rot == 0 && !this.passable([player.gx+dx, player.gy+dy])) {
+        if (rot == 0 && !this.passable(player.gy+dy, player.gx+dx)) {
             return true;
         }
         var dirs = [
@@ -137,7 +143,7 @@ class Grid extends DrawableGroup {
             if (player.grabItems[i] === null) continue;
             ind = rot == 0 ? - i : rot + i;
             [x, y] = dirs[(8 + player.startAngle + ind) % 8];
-            if (!this.passable([player.gx+x+dx, player.gy+y+dy])) {
+            if (!this.passable(player.gy+y+dy, player.gx+x+dx)) {
                 return true;
             }
         }
@@ -205,14 +211,22 @@ class Level extends GameState {
                             [-1,0], [-1,-1], [0,-1], [1,-1]
                         ];
                         var [x,y] = dirs[i];
-                        if (this.grid.grabbable([
-                            this.player.gx+x,
-                            this.player.gy+y
-                        ])){
-                            this.player.grabItems[ind] = true;
+                        if (this.grid.grabbable(
+                            this.player.gy + y,
+                            this.player.gx + x
+                        )){
+                            this.player.grabItems[ind] = this.grid.pop(
+                                this.player.gy + y,
+                                this.player.gx + x
+                            );
                         }
                     }
                     else {
+                        this.grid.push(
+                            this.player.gy + y,
+                            this.player.gx + x,
+                            this.player.grabItems[ind]
+                        );
                         this.player.grabItems[ind] = null;
                     }
                     break;
