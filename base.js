@@ -219,22 +219,32 @@ class Sprite extends Drawable {
 
     draw () {
         // console.log("draw", this, ...arguments);
+        var mat = this.ctx.getTransform();
         this.ctx.save();
+        this.ctx.setTransform(
+            1, 0, 0, 
+            1, 0, 0
+        );
+        this.ctx.translate(this.x, this.y);
+        this.ctx.transform(
+            mat.a, mat.b, mat.c,
+            mat.d, mat.e, mat.f
+        );
         if (this.sx !== undefined) {
             this.ctx.drawImage(
                 this.img,
                 this.sx, this.sy, this.sw, this.sh,
-                this.x, this.y, this.w, this.h);
+                0, 0, this.w, this.h);
         }
         else if (this.w !== undefined) {
             this.ctx.drawImage(
                 this.img,
-                this.x, this.y, this.w, this.h);
+                0, 0, this.w, this.h);
         }
         else {
             this.ctx.drawImage(
                 this.img,
-                this.x, this.y);
+                0, 0);
 
         }
         this.ctx.restore();
