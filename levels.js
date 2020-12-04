@@ -1,6 +1,7 @@
 class Item extends DrawableGroup {
-    constructor (ctx, x, y, len, gx, gy, grab, pass) {
+    constructor (ctx, name, x, y, len, gx, gy, grab, pass) {
         super(ctx, x, y);
+        this.name = name;
         this.len = len;
         this._gx = gx;
         this._gy = gy;
@@ -32,21 +33,9 @@ class Item extends DrawableGroup {
     }
 }
 
-class Wall extends Item {
-    constructor (ctx, x, y, len, gx, gy) {
-        super(ctx, x, y, len, gx, gy, false, false);
-    }
-}
-
-class Floor extends Item {
-    constructor (ctx, x, y, len, gx, gy) {
-        super(ctx, x, y, len, gx, gy, false, true);
-    }
-}
-
 class Player extends Item {
     constructor (ctx, x, y, len, gx, gy) {
-        super(ctx, x, y, len, gx, gy, false, true);
+        super(ctx, "Player", x, y, len, gx, gy, false, true);
         var path = "m0-30a30 30 0 1 1 0 60a30 30 0 1 1 0-60";
         this.body = new Path(ctx, len*gx, len*gy, path, "purple", null);
         this.legs = [
@@ -91,9 +80,10 @@ class Grid extends DrawableGroup {
                     var cell = [];
                     row[c].forEach((el)=>{
                         var [itm, drbls] = list.get(el);
-                        var item = new (itm)(
-                            this.ctx, this.x, this.y,
-                            this.len, c, r
+                        var [name, grab, pass] = itm
+                        var item = new Item(
+                            this.ctx, name, this.x, this.y,
+                            this.len, c, r, grab, pass
                         );
                         drbls.forEach((drbl)=>{
                             var [func, spec, ...args] = drbl;
@@ -235,20 +225,29 @@ var levels = [];
 
 itemList = new Map([
     [
-        "FL0", [Floor, [
-            ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#aaa", null],
-        ]]
+        "FL0", [
+            ["Floor", false, true], 
+            [
+                ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#aaa", null],
+            ]
+        ]
     ],
     [
-        "FL1", [Floor, [
-            ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
-        ]]
+        "FL1", [
+            ["Floor", false, true], 
+            [
+                ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
+            ]
+        ]
     ],
     [
-        "WL0", [Wall, [
-            ["P", (len)=>["m0 0h","v","h-","z"].join(len), "#aad", null],
-            ["P", (len)=>["m10 10h","v","h-","z"].join(len-20), "#77a", null],
-        ]]
+        "WL0", [
+            ["Wall", false, false], 
+            [
+                ["P", (len)=>["m0 0h","v","h-","z"].join(len), "#aad", null],
+                ["P", (len)=>["m10 10h","v","h-","z"].join(len-20), "#77a", null],
+            ]
+        ]
     ],
 ])
 maps = [
