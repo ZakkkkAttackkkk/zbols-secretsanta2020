@@ -1,10 +1,10 @@
 class Item extends DrawableGroup {
-    constructor (ctx, x, y, len, gx, gy, grab, pass, ...drbls) {
+    constructor (ctx, x, y, len, gx, gy, grab, pass) {
         super(ctx, x, y);
         this.len = len;
         this._gx = gx;
         this._gy = gy;
-        this.drawables = drbls;
+        this.drawables = [];
         this.grabbable = grab;
         this.passable = pass;
     }
@@ -33,14 +33,14 @@ class Item extends DrawableGroup {
 }
 
 class Wall extends Item {
-    constructor (ctx, x, y, len, gx, gy, ...drbls) {
-        super(ctx, x, y, len, gx, gy, false, false, ...drbls);
+    constructor (ctx, x, y, len, gx, gy) {
+        super(ctx, x, y, len, gx, gy, false, false);
     }
 }
 
 class Floor extends Item {
-    constructor (ctx, x, y, len, gx, gy, ...drbls) {
-        super(ctx, x, y, len, gx, gy, false, true, ...drbls);
+    constructor (ctx, x, y, len, gx, gy) {
+        super(ctx, x, y, len, gx, gy, false, true);
     }
 }
 
