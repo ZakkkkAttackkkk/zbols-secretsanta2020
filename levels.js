@@ -43,23 +43,84 @@ class Player extends Item {
             new Path(ctx, len*gx, len*gy, "m0 0h130", null, "purple"),
         ];
         this.grabItems = [null, null, null, null, null, null, null, null];
-        this.startAngle = 3;
+        this._startAngle = 5;
         this.drawables = [this.body, ...this.legs];
     }
 
+    get startAngle () {
+        return this._startAngle;
+    }
+
+    set startAngle (value) {
+        var dirs = [
+            [1,0], [1,1], [0,1], [-1,1], 
+            [-1,0], [-1,-1], [0,-1], [1,-1]
+        ], x, y, x_, y_, item;
+        for (var i = 0; i < 8; i++) {
+            item = this.grabItems[i];
+            if (item !== null) {
+                [x, y] = dirs[(this._startAngle + i) % 8];
+                [x_, y_] = dirs[(value + i) % 8];
+                item.gx += x_ - x;
+                item.gy += y_ - y;
+            }
+        }
+        this._startAngle = value;
+    }
+
+    get gx () {
+        return this._gx;
+    }
+
+    set gx (value) {
+        this.grabItems.forEach((item)=>{
+            if (item !== null) {
+                item.gx += value - this._gx;
+            }
+        })
+        this._gx = value;
+        this.drawables.forEach((drbl)=>{
+            drbl.x = this._gx * this.len;
+        })
+    }
+
+    get gy () {
+        return this._gy;
+    }
+
+    set gy (value) {
+        this.grabItems.forEach((item)=>{
+            if (item !== null) {
+                item.gy += value - this._gy;
+            }
+        })
+        this._gy = value;
+        this.drawables.forEach((drbl)=>{
+            drbl.y = this._gy * this.len;
+        })
+    }
+
     draw () {
-        for (var angle = this.startAngle % 8 / 4 * Math.PI , i = 0;
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        for (var angle = this._startAngle % 8 / 4 * Math.PI , i = 0;
             i < 8;
             angle += Math.PI/4, i++){
             this.ctx.save();
-            this.ctx.translate(this.x, this.y);
+            this.ctx.translate(this.len/2, this.len/2);
             this.ctx.rotate(angle);
             this.legs[this.grabItems[i]===null?0:1].draw();
             this.ctx.restore();
+            this.ctx.save();
+            if (this.grabItems[i] !== null) {
+                this.grabItems[i].draw();
+            }
+            this.ctx.restore();
         }
         this.ctx.save();
-        this.ctx.translate(this.x, this.y);
+        this.ctx.translate(this.len/2, this.len/2);
         this.body.draw();
+        this.ctx.restore();
         this.ctx.restore();
     }
 }
@@ -109,11 +170,21 @@ class Grid extends DrawableGroup {
     }
 
     pop (r, c) {
-        return this.cells.get([r, c]).pop();
+        var cell = this.cells.get([r, c]);
+        var ret = cell.pop();
+        if (cell.length == 0) this.cells.set([r, c], undefined);
+        return ret;
     }
 
     push (r, c, itm) {
-        return this.cells.get([r, c]).push(itm);
+        var cell = this.cells.get([r, c]);
+        if (cell == undefined) {
+            cell = []
+            this.cells.set([r, c], cell);
+        }
+        itm.gx = c;
+        itm.gy = r;
+        return cell.push(itm);
     }
 
     // Check if the cell at the given position is grabbable
@@ -138,11 +209,10 @@ class Grid extends DrawableGroup {
         var dirs = [
             [1,0], [1,1], [0,1], [-1,1], 
             [-1,0], [-1,-1], [0,-1], [1,-1]
-        ], x, y, ind;
+        ], x, y;
         for (var i = 0; i < 8 ; i++) {
             if (player.grabItems[i] === null) continue;
-            ind = rot == 0 ? - i : rot + i;
-            [x, y] = dirs[(8 + player.startAngle + ind) % 8];
+            [x, y] = dirs[(8 + player.startAngle + i + rot) % 8];
             if (!this.passable(player.gy+y+dy, player.gx+x+dx)) {
                 return true;
             }
@@ -166,7 +236,7 @@ class Level extends GameState {
     constructor (ctx, x, y, len, w, h, px, py) {
         super(ctx);
         this.grid = new Grid(ctx, x, y, len, w, h);
-        this.player = new Player(ctx, x+len/2, y+len/2, len, px, py);
+        this.player = new Player(ctx, x, y, len, px, py);
         this.drawables = [this.grid, this.player];
     }
 
@@ -205,12 +275,12 @@ class Level extends GameState {
             for (var i = 0; i < 8; i++){
                 if (ev.code === "Key" + "DCXZAQWE"[i]) {
                     var ind = (8 + i - this.player.startAngle) % 8;
+                    var dirs = [
+                        [1,0], [1,1], [0,1], [-1,1], 
+                        [-1,0], [-1,-1], [0,-1], [1,-1]
+                    ];
+                    var [x,y] = dirs[i];
                     if (this.player.grabItems[ind] === null){
-                        var dirs = [
-                            [1,0], [1,1], [0,1], [-1,1], 
-                            [-1,0], [-1,-1], [0,-1], [1,-1]
-                        ];
-                        var [x,y] = dirs[i];
                         if (this.grid.grabbable(
                             this.player.gy + y,
                             this.player.gx + x
@@ -269,13 +339,21 @@ itemList = new Map([
             ]
         ]
     ],
+    [
+        "CH0", [
+            ["Chair", true, false], 
+            [
+                ["P", (len)=>`m15 10v${len-20}m0-${len/2-10}h40v${len/2-10}`, null, "#d47912"],
+            ]
+        ]
+    ],
 ])
 maps = [
     [ // Level 0
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["FL0"], ["FL1"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     ]
 ]
 levels.push(new Level(ctx,0,0,80,10,7,3,0));
