@@ -47,10 +47,10 @@ class Trie {
         }
     }
 
-    forEach (fn) {
-        if (this.data !== undefined) fn(this.data);
-        this.values.forEach((trie) => {
-            trie.forEach(fn);
+    forEach (fn, key = []) {
+        if (this.data !== undefined) fn(this.data, key);
+        this.values.forEach((trie, ind) => {
+            trie.forEach(fn, [...key,this.keys[ind]]);
         })
     }
 }
@@ -290,9 +290,11 @@ class GameState extends DrawableGroup {
         this.drawables = [];
         this.passDraw = false;
         this.passUpdate = false;
+        this.lastTime = undefined;
     }
 
     update (t) {
+        this.lastTime = t;
         // console.log("update", this, ...arguments);
     }
 
