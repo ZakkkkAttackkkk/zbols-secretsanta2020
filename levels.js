@@ -128,13 +128,14 @@ class Grid extends DrawableGroup {
 }
 
 class Level extends GameState {
-    constructor (ctx, x, y, len, px, py, map, list) {
+    constructor (ctx, x, y, len, px, py, map, list, tests) {
         super(ctx);
         this.grid = new Grid(ctx, x, y, len);
         this.grid.register(map, list);
         // this.back = new Path(ctx, 0, 0, `m0 0h${len*w}v${len*h}H0z`, "#fff", null);
         this.player = new Player(ctx, x, y, len, px, py);
         this.drawables = [this.grid, this.player];
+        this.tests = tests
         this.elapsed = 0;
     }
 
@@ -149,20 +150,21 @@ class Level extends GameState {
                 this.elapsed -= .2;
                 this.grid.cells.forEach((cell, pos) => {
                     for (var i = cell.length - 1, item = cell[i]; i >= 0; i--) {
-                        if (item.name == "Exit" &&
-                            pos[0] == this.player.gy &&
-                            pos[1] == this.player.gx) {
-                            callbacks.push([setLevel, [item.destination]]);
+                        try {
+                            this.tests.forEach((test) => {
+                                var cbck = test(item, pos, this);
+                                if (cbck != null) {
+                                    callbacks.push(cbck);
+                                }
+                            });
                         }
-                        if (item.name == "Puddle") {
-                            if (this.player.grabItems.some((grab) => 
-                                grab != null && grab.name == "Sponge" &&
-                                pos[0] == grab.gy && pos[1] == grab.gx 
-                            )) {
-                                callbacks.push([(grid, pos) => {
-                                    grid.pop(...pos);
-                                }, [this.grid, pos]]);
-                                break;
+                        catch (ex) {
+                            if (Array.isArray(ex)) {
+                                if (ex[0] == "stop") {
+                                    callbacks.push(ex[1]);
+                                    console.log(callbacks);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -248,6 +250,32 @@ cnv = document.getElementById("cnv-main");
 ctx = cnv.getContext("2d");
 
 var levels = [];
+
+function exitTest (item, pos, level) {
+    if (item.name == "Exit" &&
+        pos[0] == level.player.gy &&
+        pos[1] == level.player.gx) {
+        return [setLevel, [item.destination]];
+    }
+}
+
+function soakTest (item, pos, level) {
+    if (item.name == "Puddle") {
+        if (level.player.grabItems.some((grab) => 
+            (grab != null && grab.name == "Sponge" &&
+            pos[0] == grab.gy && pos[1] == grab.gx)
+        )) {
+            throw [
+                "stop",
+                [
+                    (grid, pos) => grid.pop(...pos), 
+                    [level.grid, pos]
+                ]
+            ];
+        }
+    }
+}
+
 maps = [
     [ // Level 0
         [["FL1","SPN"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
@@ -255,7 +283,7 @@ maps = [
         [null   , null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0",["EXT",1]], ["FL1","PUD"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     ],
-    [ // Level 0
+    [ // Level 1
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
@@ -265,8 +293,10 @@ maps = [
     ]
 ]
 
-levels.push(new Level(ctx,0,0,80,3,0,maps[0],itemList));
-levels.push(new Level(ctx,0,0,80,3,0,maps[1],itemList));
+levels.push(new Level(ctx,0,0,80,3,0,maps[0],itemList,
+    [exitTest,soakTest]));
+levels.push(new Level(ctx,0,0,80,3,0,maps[1],itemList,
+    [exitTest]));
 
 function setLevel(level) {
     console.log("setting level to",level);
