@@ -10,6 +10,18 @@ class Item extends DrawableGroup {
         this.passable = pass ?? false;
         this.hoverable = hov ?? true;
         this.dynamic = dyn ?? false;
+        this.sx = this.sy = this.sz = null;
+    }
+
+    save (z) {
+        this.sx = this._gx;
+        this.sy = this._gy;
+        this.sz = z;
+    }
+
+    reset () {
+        this.gx = this.sx;
+        this.gy = this.sy;
     }
 
     spec (...specs) {
@@ -80,12 +92,28 @@ class Player extends Item {
             new Path(ctx, null, null, "m0 30l80 30M0 60L80 30", null, "purple"),
         ];
         this.grabItems = [null, null, null, null, null, null, null, null];
+        this.saveItems = null;
         this._startAngle = 5;
+        this.saveAngle = null;
         this.drawables = [this.body, ...this.legs];
         this.dirs = [
             [1,0], [1,1], [0,1], [-1,1], 
             [-1,0], [-1,-1], [0,-1], [1,-1]
         ];
+    }
+
+    save () {
+        this.sx = this._gx;
+        this.sy = this._gy;
+        this.saveItems = this.grabItems.slice();
+        this.saveAngle = this._startAngle;
+    }
+
+    reset () {
+        this.gx = this.sx;
+        this.gy = this.sy;
+        this._startAngle = this.saveAngle;
+        this.grabItems = this.saveItems.slice();
     }
 
     get startAngle () {

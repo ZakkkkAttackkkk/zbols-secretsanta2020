@@ -3,6 +3,7 @@ class Grid extends DrawableGroup {
         super(ctx, x, y);
         this.len = len;
         this.cells = new Trie();
+        this.saveState = null;
         this.drawables = this.cells;
         this.dynamic = [];
     }
@@ -47,6 +48,30 @@ class Grid extends DrawableGroup {
                 }
             }
         }
+    }
+
+    save () {
+        this.saveState = new Trie();
+        this.cells.forEach((cell, key) => {
+            var stack = [];
+            cell.forEach((item, ind) => {
+                item.save(ind);
+                stack.push(item);
+            });
+            this.saveState.set(key, stack);
+        });
+    }
+
+    reset () {
+        this.cells = new Trie();
+        this.saveState.forEach((cell, key) => {
+            var stack = [];
+            cell.forEach((item) => {
+                item.reset();
+                stack.push(item);
+            });
+            this.cells.set(key, stack);
+        });
     }
 
     pop (r, c) {
@@ -141,6 +166,16 @@ class Level extends GameState {
         this.elapsed = 0;
     }
 
+    save () {
+        this.player.save();
+        this.grid.save();
+    }
+
+    reset () {
+        this.player.reset();
+        this.grid.reset();
+    }
+
     update (t) {
         if (this.lastTime == undefined) {
             this.elapsed = 0;
@@ -210,6 +245,9 @@ class Level extends GameState {
             if (!this.grid.collide(0, 0, 1, this.player)){
                 this.player.startAngle = (this.player.startAngle + 1) % 8
             }
+        }
+        else if (ev.code === "KeyR") {
+            this.reset();
         }
         else {
             for (var i = 0; i < 8; i++){
@@ -322,5 +360,6 @@ function setLevel(level, x, y, srcpos, angle, grab) {
         grab.gx = x + dx;
         grab.gy = y + dy;
     }
+    levels[level].save();
     states.push(levels[level]);
 }
