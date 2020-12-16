@@ -46,10 +46,11 @@ class Exit extends Item {
         this.dynamic = true;
     }
 
-    spec (tlvl, tx, ty) {
+    spec (tlvl, tx, ty, tang) {
         this.target = tlvl;
         this.tx = tx;
         this.ty = ty;
+        this.tangle = tang
     }
 }
 
@@ -81,6 +82,10 @@ class Player extends Item {
         this.grabItems = [null, null, null, null, null, null, null, null];
         this._startAngle = 5;
         this.drawables = [this.body, ...this.legs];
+        this.dirs = [
+            [1,0], [1,1], [0,1], [-1,1], 
+            [-1,0], [-1,-1], [0,-1], [1,-1]
+        ];
     }
 
     get startAngle () {
@@ -88,15 +93,12 @@ class Player extends Item {
     }
 
     set startAngle (value) {
-        var dirs = [
-            [1,0], [1,1], [0,1], [-1,1], 
-            [-1,0], [-1,-1], [0,-1], [1,-1]
-        ], x, y, x_, y_, item;
+        var x, y, x_, y_, item;
         for (var i = 0; i < 8; i++) {
             item = this.grabItems[i];
             if (item !== null) {
-                [x, y] = dirs[(this._startAngle + i) % 8];
-                [x_, y_] = dirs[(value + i) % 8];
+                [x, y] = this.dirs[(this._startAngle + i) % 8];
+                [x_, y_] = this.dirs[(value + i) % 8];
                 item.gx += x_ - x;
                 item.gy += y_ - y;
             }

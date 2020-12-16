@@ -215,11 +215,7 @@ class Level extends GameState {
             for (var i = 0; i < 8; i++){
                 if (ev.code === "Key" + "DCXZAQWE"[i]) {
                     var ind = (8 + i - this.player.startAngle) % 8;
-                    var dirs = [
-                        [1,0], [1,1], [0,1], [-1,1], 
-                        [-1,0], [-1,-1], [0,-1], [1,-1]
-                    ];
-                    var [x,y] = dirs[i];
+                    var [x,y] = this.player.dirs[i];
                     if (this.player.grabItems[ind] === null){
                         if (this.grid.grabbable(
                             this.player.gy + y,
@@ -257,7 +253,25 @@ function exitTest (item, pos, level) {
     if (item.name == "Exit" &&
         pos[0] == level.player.gy &&
         pos[1] == level.player.gx) {
-        return [setLevel, [item.target, item.tx, item.ty]];
+        var count = level.player.grabItems.filter((el)=> el!=null).length;
+        if (count <= (item.tangle == null ? 0 : 1)) {
+            var grab = null;
+            if (count > 0) {
+                for (var i = 7; i >= 0; i--) {
+                    if (level.player.grabItems[i] != null) {
+                        grab = level.player.grabItems[i];
+                        level.player.grabItems[i] = null;
+                        break;
+                    }
+                }
+            }
+            console.log("returning");
+            throw ["stop",[
+                setLevel, 
+                [item.target, item.tx, item.ty, pos, item.tangle, grab]
+            ]];
+        }
+        console.log("testing",level.player.grabItems.filter((el)=> {return el!=null}));
     }
 }
 
@@ -267,13 +281,10 @@ function soakTest (item, pos, level) {
             (grab != null && grab.name == "Sponge" &&
             pos[0] == grab.gy && pos[1] == grab.gx)
         )) {
-            throw [
-                "stop",
-                [
-                    (grid, pos) => grid.pop(...pos), 
-                    [level.grid, pos]
-                ]
-            ];
+            throw ["stop",[
+                (grid, pos) => grid.pop(...pos), 
+                [level.grid, pos]
+            ]];
         }
     }
 }
@@ -283,12 +294,12 @@ maps = [
         [["FL1","SPN"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["WL0"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0",["EXT",1,3,0]], ["FL1","PUD"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["FL0",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     ],
     [ // Level 1
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
-        [["FL1",["EXT",0,3,0]], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
+        [["FL1",["EXT",0,3,0,2]], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
@@ -300,10 +311,17 @@ levels.push(new Level(ctx,0,0,80,3,0,maps[0],itemList,
 levels.push(new Level(ctx,0,0,80,3,0,maps[1],itemList,
     [exitTest]));
 
-function setLevel(level, x, y) {
-    console.log("setting level to",level,"at",x,y);
+function setLevel(level, x, y, srcpos, angle, grab) {
+    console.log("setting level to",level,"at",x,y,"with",grab,"at",angle);
     states.pop();
     levels[level].player.gx = x;
     levels[level].player.gy = y;
+    if (angle != null) {
+        levels[level].player.startAngle = angle;
+        levels[level].player.grabItems[0] = grab;
+        var [dx, dy] = levels[level].player.dirs[angle];
+        grab.gx = x + dx;
+        grab.gy = y + dy;
+    }
     states.push(levels[level]);
 }
