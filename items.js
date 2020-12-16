@@ -74,6 +74,7 @@ class Player extends Item {
         this.legs = [
             new Path(ctx, len*gx, len*gy, "m0 0h50", null, "purple"),
             new Path(ctx, len*gx, len*gy, "m0 0h130", null, "purple"),
+            new Path(ctx, len*gx, len*gy, "m0 30l80 30M0 60L80 30", null, "purple"),
         ];
         this.grabItems = [null, null, null, null, null, null, null, null];
         this._startAngle = 5;
@@ -136,19 +137,25 @@ class Player extends Item {
     draw () {
         this.ctx.save();
         this.ctx.translate(this.x, this.y);
-        for (var angle = this._startAngle % 8 / 4 * Math.PI , i = 0;
+        for (var angle = this._startAngle % 8 / 4 * Math.PI, i = 0,
+            item = this.grabItems[i];
             i < 8;
-            angle += Math.PI/4, i++){
+            angle += Math.PI/4, i++, item = this.grabItems[i]){
             this.ctx.save();
             this.ctx.translate(this.len/2, this.len/2);
             this.ctx.rotate(angle);
-            this.legs[this.grabItems[i]===null?0:1].draw();
+            this.legs[item===null?0:1].draw();
             this.ctx.restore();
-            this.ctx.save();
-            if (this.grabItems[i] !== null) {
-                this.grabItems[i].draw();
+            if (item !== null) {
+                this.ctx.save();
+                item.draw();
+                this.ctx.translate(
+                    this.len * (item.gx - this.gx),
+                    this.len * (item.gy - this.gy)
+                )
+                this.legs[2].draw();
+                this.ctx.restore();
             }
-            this.ctx.restore();
         }
         this.ctx.save();
         this.ctx.translate(this.len/2, this.len/2);
