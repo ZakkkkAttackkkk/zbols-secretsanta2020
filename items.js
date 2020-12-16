@@ -46,8 +46,10 @@ class Exit extends Item {
         this.dynamic = true;
     }
 
-    spec (dest) {
-        this.destination = dest;
+    spec (tlvl, tx, ty) {
+        this.target = tlvl;
+        this.tx = tx;
+        this.ty = ty;
     }
 }
 

@@ -131,6 +131,8 @@ class Level extends GameState {
     constructor (ctx, x, y, len, px, py, map, list, tests) {
         super(ctx);
         this.grid = new Grid(ctx, x, y, len);
+        this.map = map;
+        this.list = list;
         this.grid.register(map, list);
         // this.back = new Path(ctx, 0, 0, `m0 0h${len*w}v${len*h}H0z`, "#fff", null);
         this.player = new Player(ctx, x, y, len, px, py);
@@ -255,7 +257,7 @@ function exitTest (item, pos, level) {
     if (item.name == "Exit" &&
         pos[0] == level.player.gy &&
         pos[1] == level.player.gx) {
-        return [setLevel, [item.destination]];
+        return [setLevel, [item.target, item.tx, item.ty]];
     }
 }
 
@@ -278,15 +280,15 @@ function soakTest (item, pos, level) {
 
 maps = [
     [ // Level 0
-        [["FL1","SPN"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
+        [["FL1","SPN"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
-        [null   , null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0",["EXT",1]], ["FL1","PUD"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["WL0"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
+        [["FL0",["EXT",1,3,0]], ["FL1","PUD"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     ],
     [ // Level 1
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
-        [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
+        [["FL1",["EXT",0,3,0]], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
@@ -298,8 +300,10 @@ levels.push(new Level(ctx,0,0,80,3,0,maps[0],itemList,
 levels.push(new Level(ctx,0,0,80,3,0,maps[1],itemList,
     [exitTest]));
 
-function setLevel(level) {
-    console.log("setting level to",level);
+function setLevel(level, x, y) {
+    console.log("setting level to",level,"at",x,y);
     states.pop();
+    levels[level].player.gx = x;
+    levels[level].player.gy = y;
     states.push(levels[level]);
 }
