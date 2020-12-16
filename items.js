@@ -69,15 +69,15 @@ class Wall extends Item {
 }
 
 class Player extends Item {
-    constructor (ctx, x, y, len, gx, gy) {
-        super(ctx, "Player", x, y, len, gx, gy);
+    constructor (ctx, x, y, len) {
+        super(ctx, "Player", x, y, len);
         this.passable = true;
         var path = "m0-30a30 30 0 1 1 0 60a30 30 0 1 1 0-60";
-        this.body = new Path(ctx, len*gx, len*gy, path, "purple", null);
+        this.body = new Path(ctx, null, null, path, "purple", null);
         this.legs = [
-            new Path(ctx, len*gx, len*gy, "m0 0h50", null, "purple"),
-            new Path(ctx, len*gx, len*gy, "m0 0h130", null, "purple"),
-            new Path(ctx, len*gx, len*gy, "m0 30l80 30M0 60L80 30", null, "purple"),
+            new Path(ctx, null, null, "m0 0h50", null, "purple"),
+            new Path(ctx, null, null, "m0 0h130", null, "purple"),
+            new Path(ctx, null, null, "m0 30l80 30M0 60L80 30", null, "purple"),
         ];
         this.grabItems = [null, null, null, null, null, null, null, null];
         this._startAngle = 5;

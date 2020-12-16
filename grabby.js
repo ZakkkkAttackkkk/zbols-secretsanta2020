@@ -1,6 +1,7 @@
-let states = [levels[0]];
+let states = [];
 
 function main () {
+    setLevel(0, 3, 0);
     run();
 }
 

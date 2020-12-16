@@ -128,14 +128,14 @@ class Grid extends DrawableGroup {
 }
 
 class Level extends GameState {
-    constructor (ctx, x, y, len, px, py, map, list, tests) {
+    constructor (ctx, x, y, len, map, list, tests) {
         super(ctx);
         this.grid = new Grid(ctx, x, y, len);
         this.map = map;
         this.list = list;
         this.grid.register(map, list);
         // this.back = new Path(ctx, 0, 0, `m0 0h${len*w}v${len*h}H0z`, "#fff", null);
-        this.player = new Player(ctx, x, y, len, px, py);
+        this.player = new Player(ctx, x, y, len);
         this.drawables = [this.grid, this.player];
         this.tests = tests
         this.elapsed = 0;
@@ -265,13 +265,12 @@ function exitTest (item, pos, level) {
                     }
                 }
             }
-            console.log("returning");
+            level.player.gx = level.player.gy = null;
             throw ["stop",[
                 setLevel, 
                 [item.target, item.tx, item.ty, pos, item.tangle, grab]
             ]];
         }
-        console.log("testing",level.player.grabItems.filter((el)=> {return el!=null}));
     }
 }
 
@@ -306,9 +305,9 @@ maps = [
     ]
 ]
 
-levels.push(new Level(ctx,0,0,80,3,0,maps[0],itemList,
+levels.push(new Level(ctx,0,0,80,maps[0],itemList,
     [exitTest,soakTest]));
-levels.push(new Level(ctx,0,0,80,3,0,maps[1],itemList,
+levels.push(new Level(ctx,0,0,80,maps[1],itemList,
     [exitTest]));
 
 function setLevel(level, x, y, srcpos, angle, grab) {
