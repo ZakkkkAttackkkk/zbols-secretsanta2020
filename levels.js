@@ -293,7 +293,7 @@ maps = [
         [["FL1","SPN"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["WL0"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["FL0",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","BOX"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     ],
     [ // Level 1
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
@@ -301,7 +301,7 @@ maps = [
         [["FL1",["EXT",0,3,0,2]], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0"], ["FL1"], ["FL0","CH0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["FL0"], ["FL1"], ["FL0","BOX"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     ]
 ]
 
@@ -315,7 +315,7 @@ function setLevel(level, x, y, srcpos, angle, grab) {
     states.pop();
     levels[level].player.gx = x;
     levels[level].player.gy = y;
-    if (angle != null) {
+    if (grab != null) {
         levels[level].player.startAngle = angle;
         levels[level].player.grabItems[0] = grab;
         var [dx, dy] = levels[level].player.dirs[angle];

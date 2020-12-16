@@ -220,6 +220,16 @@ itemList = new Map([
         ]
     ],
     [
+        "BOX", [
+            [Item, "Box", true, false, false], 
+            [
+                ["P", (len)=>`m10 10h${len-20}v${len-20}H10z`, "#d47912", null],
+                ["P", (len)=>`m30 20h${len-50}v${len-50}zM20 30v${len-50}h${len-50}z`, "#f89c67", null],
+                ["P", (len)=>`m20 20h${len-40}v${len-40}H20z`, null, "#f89c67"],
+            ]
+        ]
+    ],
+    [
         "EXT", [
             [Exit], 
             [
