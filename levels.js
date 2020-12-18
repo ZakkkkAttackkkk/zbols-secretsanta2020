@@ -368,7 +368,10 @@ function eGateTest (item, pos, level) {
     if (item.name == "EGate") {
         var cell = level.grid.cells.get(pos);
         if (cell[cell.length-1] != item ||
-            (level.player.gx == pos[1] && level.player.gy == pos[0]))
+            (level.player.gx == pos[1] && level.player.gy == pos[0]) ||
+            level.player.grabItems.some((item) => 
+                item != null && item.gx == pos[1] && item.gy == pos[0]
+            ))
             return [
                 null,
                 (itm) => itm.force(),
