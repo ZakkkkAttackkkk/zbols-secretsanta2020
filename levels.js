@@ -387,6 +387,20 @@ function eGateTest (item, pos, level) {
     }
 }
 
+function gateTest (item, pos, level) {
+    if (item.name == "Gate") {
+        for (var i = 0; i < 8; i++) {
+            var grab = level.player.grabItems[i];
+            if (grab != null &&
+                grab.name == "Key" && grab.tag == item.tag &&
+                grab.gx == pos[1] && grab.gy == pos[0]) {
+                item.state = true;
+                level.player.grabItems[i] = null;
+            }
+        }
+    }
+}
+
 world = {
     states: new OptSet(),
 }
@@ -403,14 +417,14 @@ maps = [
         [["FL1",["EXT",0,3,0,2]], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0"], ["FL1"], ["FL0","BOX"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["FL0",["KEY",100]], ["FL1"], ["FL0","BOX"], ["FL1"], ["FL0"], ["FL1",["GAT",100]], ["FL0"], ],
     ]
 ]
 
 levels.push(new Level(ctx,0,0,80,world,maps[0],itemList,
     [exitTest,soakTest,floorSwitchTest,eGateTest]));
 levels.push(new Level(ctx,0,0,80,world,maps[1],itemList,
-    [exitTest]));
+    [exitTest, gateTest]));
 
 function setLevel(level, x, y, srcpos, angle, grab) {
     console.log("setting level to",level,"at",x,y,"with",grab,"at",angle);

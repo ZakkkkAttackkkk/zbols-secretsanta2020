@@ -92,12 +92,13 @@ class Wall extends Item {
 class Gate extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Gate", x, y, len, gx, gy);
-        this.hoverable = false;
-        this._state = null;
+        this.hoverable = true;
+        this.state = false;
+        this.tag = null;
     }
 
-    spec (state) {
-        this.state = state;
+    spec (tag) {
+        this.tag = tag;
     }
 
     save () {
@@ -113,7 +114,7 @@ class Gate extends Item {
     }
 
     set state(val) {
-        this._state = this.passable = this.hoverable = val;
+        this._state = this.passable = val;
     }
 
     draw () {
@@ -121,6 +122,20 @@ class Gate extends Item {
         this.ctx.translate(this.x, this.y);
         this.drawables[this._state ? 1 : 0].draw();
         this.ctx.restore();
+    }
+}
+
+class Key extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Key", x, y, len, gx, gy);
+        this.grabbable = true;
+        this.passable = true;
+        this.hoverable = true;
+        this.tag = null;
+    }
+
+    spec (tag) {
+        this.tag = tag;
     }
 }
 
@@ -189,7 +204,6 @@ class WallSwitch extends Switch {
 class EGate extends Gate {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "EGate", x, y, len, gx, gy);
-        this.tag = null;
         this.inv = false;
         this.state = false;
     }
@@ -427,8 +441,24 @@ itemList = new Map([
             [EGate], 
             [
                 ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "red", null],
-                // ["P", (len)=>["M5 5L"," ","M"," 5L5 ",""].join(len-5), null, "red"],
                 ["P", ()=>"", null, null],
+            ]
+        ]
+    ],
+    [
+        "GAT", [
+            [Gate], 
+            [
+                ["P", (len)=>`M0 20H20V${len-20}H0M0 ${len/2}H20M${len} 20h-20V${len-20}h20M${[len,len/2]}h-20M20 20L${[len-20,len-20]}M20 ${len-20}L${len-20} 20`, null, "brown"],
+                ["P", (len)=>`M0 20H20V${len-20}H0M0 ${len/2}H20M${len} 20h-20V${len-20}h20M${[len,len/2]}h-20`, null, "brown"],
+            ]
+        ]
+    ],
+    [
+        "KEY", [
+            [Key], 
+            [
+                ["P", ()=>"M30 45L40 55M30 65L20 55L45 30A5 5 0 1 1 60 15A5 5 0 1 1 45 30", null, "gold"],
             ]
         ]
     ],
