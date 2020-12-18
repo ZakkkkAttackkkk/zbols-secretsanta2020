@@ -10,6 +10,7 @@ class Item extends DrawableGroup {
         this.passable = pass ?? false;
         this.hoverable = hov ?? true;
         this.dynamic = dyn ?? false;
+        this.world = null;
         this.sx = this.sy = this.sz = null;
     }
 
@@ -77,6 +78,125 @@ class Wall extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Wall", x, y, len, gx, gy);
         this.hoverable = false;
+    }
+}
+
+class Gate extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Gate", x, y, len, gx, gy);
+        this.hoverable = false;
+        this._state = null;
+    }
+
+    spec (state) {
+        this.state = state;
+    }
+
+    save () {
+        this.saveState = this._state;
+    }
+
+    reset () {
+        this.state = this.saveState;
+    }
+
+    get state() {
+        return this._state;
+    }
+
+    set state(val) {
+        this._state = this.passable = this.hoverable = val;
+    }
+
+    draw () {
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        this.drawables[this._state ? 1 : 0].draw();
+        this.ctx.restore();
+    }
+}
+
+class Switch extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Switch", x, y, len, gx, gy);
+        this.passable = true;
+        this._state = false;
+        this.saveState = this.tag = null;
+    }
+
+    spec (state, tag) {
+        this.state = state;
+        this.tag = tag;
+    }
+
+    save () {
+        this.saveState = this._state;
+    }
+
+    reset () {
+        this.state = this.saveState;
+    }
+
+    get state() {
+        return this._state;
+    }
+
+    set state(val) {
+        this._state = val;
+        if (val) {
+            this.world.states.add(this.tag);
+        }
+        else {
+            this.world.states.remove(this.tag);
+        }
+    }
+
+    draw () {
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        this.drawables[this._state ? 1 : 0].draw();
+        this.ctx.restore();
+    }
+}
+
+class EGate extends Gate {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "EGate", x, y, len, gx, gy);
+        this.tag = null;
+        this.inv = false;
+        this.state = false;
+    }
+
+    spec (inv, tag) {
+        this.inv = inv;
+        this.tag = tag;
+    }
+
+    save () {
+        this.saveState = this._state;
+    }
+
+    reset () {
+        this.state = this.saveState;
+    }
+
+    get state() {
+        return this._state;
+    }
+
+    set state(val) {
+        this._state = this.passable = this.hoverable = val ^ this.inv;
+    }
+
+    force () {
+        this.state = !(this.inv);
+    }
+
+    draw () {
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        this.drawables[this._state ? 1 : 0].draw();
+        this.ctx.restore();
     }
 }
 
@@ -254,6 +374,25 @@ itemList = new Map([
                 ["P", (len)=>`m10 10h${len-20}v${len-20}H10z`, "#d47912", null],
                 ["P", (len)=>`m30 20h${len-50}v${len-50}zM20 30v${len-50}h${len-50}z`, "#f89c67", null],
                 ["P", (len)=>`m20 20h${len-40}v${len-40}H20z`, null, "#f89c67"],
+            ]
+        ]
+    ],
+    [
+        "FSW", [
+            [Switch, "Floor Switch"], 
+            [
+                ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "#9a9a9b", null],
+                ["P", (len)=>["M0 0H","V","H0Z"].join(len), "#12ef13", null],
+            ]
+        ]
+    ],
+    [
+        "EGT", [
+            [EGate], 
+            [
+                ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "red", null],
+                // ["P", (len)=>["M5 5L"," ","M"," 5L5 ",""].join(len-5), null, "red"],
+                ["P", ()=>"", null, null],
             ]
         ]
     ],

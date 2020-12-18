@@ -1,7 +1,8 @@
 class Grid extends DrawableGroup {
-    constructor (ctx, x, y, len) {
+    constructor (ctx, x, y, len, world) {
         super(ctx, x, y);
         this.len = len;
+        this.world = world;
         this.cells = new Trie();
         this.saveState = null;
         this.drawables = this.cells;
@@ -9,6 +10,7 @@ class Grid extends DrawableGroup {
     }
 
     register (map, list) {
+        var switches = new Trie();
         for (var r = 0; r < map.length; r++) {
             var row = map[r];
             for (var c = 0; c < row.length; c++) {
@@ -23,6 +25,7 @@ class Grid extends DrawableGroup {
                             this.ctx, name, this.x, this.y,
                             this.len, c, r, ...attrs
                         );
+                        item.world = this.world;
                         if (spec.length > 0) item.spec(...spec);
                         drbls.forEach((drbl)=>{
                             var [func, spec, ...args] = drbl;
@@ -153,13 +156,13 @@ class Grid extends DrawableGroup {
 }
 
 class Level extends GameState {
-    constructor (ctx, x, y, len, map, list, tests) {
+    constructor (ctx, x, y, len, world, map, list, tests) {
         super(ctx);
-        this.grid = new Grid(ctx, x, y, len);
+        this.grid = new Grid(ctx, x, y, len, world);
+        this.world = world;
         this.map = map;
         this.list = list;
         this.grid.register(map, list);
-        // this.back = new Path(ctx, 0, 0, `m0 0h${len*w}v${len*h}H0z`, "#fff", null);
         this.player = new Player(ctx, x, y, len);
         this.drawables = [this.grid, this.player];
         this.tests = tests
@@ -187,25 +190,20 @@ class Level extends GameState {
                 this.elapsed -= .2;
                 this.grid.cells.forEach((cell, pos) => {
                     for (var i = cell.length - 1, item = cell[i]; i >= 0; i--) {
-                        try {
-                            this.tests.forEach((test) => {
-                                var cbck = test(item, pos, this);
-                                if (cbck != null) {
-                                    callbacks.push(cbck);
-                                }
-                            });
-                        }
-                        catch (ex) {
-                            if (Array.isArray(ex)) {
-                                if (ex[0] == "stop") {
-                                    callbacks.push(ex[1]);
-                                    console.log(callbacks);
+                        for (var j = 0; j < this.tests.length; j++) {
+                            var ret = this.tests[j](item, pos, this);
+                            if (ret != null) {
+                                var [skip, func, args] = ret;
+                                callbacks.push([func, args]);
+                                if (skip == "cell") {
+                                    i = -1;
                                     break;
                                 }
                             }
                         }
                     }
                 });
+                // if (callbacks.length) console.log(callbacks);
                 callbacks.forEach((cbck) => {
                     var [fn, args] = cbck;
                     fn(...args);
@@ -304,10 +302,11 @@ function exitTest (item, pos, level) {
                 }
             }
             level.player.gx = level.player.gy = null;
-            throw ["stop",[
+            return[
+                null,
                 setLevel, 
                 [item.target, item.tx, item.ty, pos, item.tangle, grab]
-            ]];
+            ];
         }
     }
 }
@@ -318,20 +317,71 @@ function soakTest (item, pos, level) {
             (grab != null && grab.name == "Sponge" &&
             pos[0] == grab.gy && pos[1] == grab.gx)
         )) {
-            throw ["stop",[
+            return [
+                "cell",
                 (grid, pos) => grid.pop(...pos), 
                 [level.grid, pos]
-            ]];
+            ];
         }
     }
 }
 
+function floorSwitchTest (item, pos, level) {
+    if (item.name == "Floor Switch") {
+        var cell = level.grid.cells.get(pos);
+        if (cell[cell.length-1] != item || (
+                pos[1] == level.player.gx &&
+                pos[0] == level.player.gy
+            )) {
+            return [
+                null,
+                (level, item) => {
+                    level.world.states.add(item.tag);
+                    item.state = true;
+                }, 
+                [level, item]
+            ];
+        }
+        else {
+            return [
+                null,
+                (level, item) => {
+                    level.world.states.remove(item.tag);
+                    item.state = false;
+                },
+                [level, item]
+            ];
+        }
+    }
+}
+
+function eGateTest (item, pos, level) {
+    if (item.name == "EGate") {
+        var cell = level.grid.cells.get(pos);
+        if (cell[cell.length-1] != item ||
+            (level.player.gx == pos[1] && level.player.gy == pos[0]))
+            return [
+                null,
+                (itm) => itm.force(),
+                [item]
+            ];
+        else return [
+            null,
+            (item, state) => {item.state = state},
+            [item,level.world.states.has(item.tag)]
+        ];
+    }
+}
+
+world = {
+    states: new OptSet(),
+}
 maps = [
     [ // Level 0
         [["FL1","SPN"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
-        [["WL0"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
-        [["FL0",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","BOX"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+        [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
+        [["WL0"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ["FL0"], ],
+        [["FL0",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","BOX"], ["FL1"], ["FL0",["FSW",false,1]], ["FL1",["EGT",false,1]], ["FL0",["EGT",true,1]], ["FL1"], ],
     ],
     [ // Level 1
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
@@ -343,9 +393,9 @@ maps = [
     ]
 ]
 
-levels.push(new Level(ctx,0,0,80,maps[0],itemList,
-    [exitTest,soakTest]));
-levels.push(new Level(ctx,0,0,80,maps[1],itemList,
+levels.push(new Level(ctx,0,0,80,world,maps[0],itemList,
+    [exitTest,soakTest,floorSwitchTest,eGateTest]));
+levels.push(new Level(ctx,0,0,80,world,maps[1],itemList,
     [exitTest]));
 
 function setLevel(level, x, y, srcpos, angle, grab) {

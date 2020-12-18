@@ -9,6 +9,41 @@ function bisect (arr, el) {
     return m+1;
 }
 
+class OptSet {
+    constructor () {
+        this.values = [];
+    }
+
+    add (data) {
+        var ind = bisect(this.values, data);
+        if (this.values[ind] != data || this.values[ind] == undefined) {
+            this.values.splice(ind,0,data);
+        }
+    }
+
+    remove (data) {
+        var ind = bisect(this.values, data);
+        if (this.values[ind] == data) {
+            this.values.splice(ind,1);
+        }
+    }
+
+    toggle (data) {
+        var ind = bisect(this.values, data);
+        if (this.values[ind] != data || this.values[ind] == undefined) {
+            this.values.splice(ind,0,data);
+        }
+        else {
+            this.values.splice(ind,1);
+        }
+    }
+
+    has (data) {
+        var ind = bisect(this.values, data);
+        return this.values[ind] == data;
+    }
+}
+
 class Trie {
     constructor () {
         this.data = undefined;
