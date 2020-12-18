@@ -341,6 +341,8 @@ function floorSwitchTest (item, pos, level) {
         if (cell[cell.length-1] != item || (
                 pos[1] == level.player.gx &&
                 pos[0] == level.player.gy
+            ) || level.player.grabItems.some((item) => 
+                item != null && item.gx == pos[1] && item.gy == pos[0]
             )) {
             return [
                 null,
