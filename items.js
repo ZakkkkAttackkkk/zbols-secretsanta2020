@@ -12,6 +12,7 @@ class Item extends DrawableGroup {
         this.dynamic = dyn ?? false;
         this.world = null;
         this.sx = this.sy = this.sz = null;
+        this.grabbed = false;
     }
 
     save (z) {
@@ -49,6 +50,13 @@ class Item extends DrawableGroup {
         this.drawables.forEach((drbl)=>{
             drbl.y = this._gy * this.len;
         })
+    }
+
+    grab (player, state) {
+        if (this.grabbable) {
+            this.grabbed = state;
+        }
+        return this.grabbable;
     }
 }
 
@@ -119,7 +127,6 @@ class Gate extends Item {
 class Switch extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Switch", x, y, len, gx, gy);
-        this.passable = true;
         this._state = false;
         this.saveState = this.tag = null;
     }
@@ -156,6 +163,26 @@ class Switch extends Item {
         this.ctx.translate(this.x, this.y);
         this.drawables[this._state ? 1 : 0].draw();
         this.ctx.restore();
+    }
+}
+
+class FloorSwitch extends Switch {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Floor Switch", x, y, len, gx, gy);
+        this.passable = true;
+    }
+}
+
+class WallSwitch extends Switch {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Wall Switch", x, y, len, gx, gy);
+        this.hoverable = false;
+        this.grabbable = true;
+    }
+
+    grab (player, state) {
+        this.state = !(this.state);
+        return false;
     }
 }
 
@@ -378,8 +405,17 @@ itemList = new Map([
         ]
     ],
     [
+        "WSW", [
+            [WallSwitch], 
+            [
+                ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "#9a9a9b", null],
+                ["P", (len)=>["M0 0H","V","H0Z"].join(len), "#12ef13", null],
+            ]
+        ]
+    ],
+    [
         "FSW", [
-            [Switch, "Floor Switch"], 
+            [FloorSwitch], 
             [
                 ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "#9a9a9b", null],
                 ["P", (len)=>["M0 0H","V","H0Z"].join(len), "#12ef13", null],

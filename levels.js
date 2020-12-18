@@ -77,10 +77,14 @@ class Grid extends DrawableGroup {
         });
     }
 
+    peek (r, c) {
+        var cell = this.cells.get([r, c]);
+        return cell != null ? cell[cell.length - 1] : cell;
+    }
+
     pop (r, c) {
         var cell = this.cells.get([r, c]);
         var ret = cell.pop();
-        console.log("pop",ret);
         if (cell.length == 0) this.cells.set([r, c], undefined);
         return ret;
     }
@@ -257,13 +261,18 @@ class Level extends GameState {
                             this.player.gy + y,
                             this.player.gx + x
                         )){
-                            this.player.grabItems[ind] = this.grid.pop(
+                            if (this.grid.peek(
                                 this.player.gy + y,
                                 this.player.gx + x
-                            );
+                            ).grab(this.player, true)) {
+                                this.player.grabItems[ind] = this.grid.pop(
+                                    this.player.gy + y,
+                                    this.player.gx + x
+                                );
+                            }
                         }
                     }
-                    else {
+                    else if (this.player.grabItems[ind].grab(this.playe, false)) {
                         this.grid.push(
                             this.player.gy + y,
                             this.player.gx + x,
@@ -378,7 +387,7 @@ world = {
 }
 maps = [
     [ // Level 0
-        [["FL1","SPN"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
+        [["FL1","SPN"], ["WL0"], ["FL1"], ["FL0"], ["FL1",["EGT",true,2]], ["FL0",["EGT",false,2]], ["WL0"], ["FL0",["WSW",false,2]], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
         [["WL0"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ["FL0"], ],
         [["FL0",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","BOX"], ["FL1"], ["FL0",["FSW",false,1]], ["FL1",["EGT",false,1]], ["FL0",["EGT",true,1]], ["FL1"], ],
