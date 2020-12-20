@@ -272,7 +272,7 @@ class Level extends GameState {
                             }
                         }
                     }
-                    else if (this.player.grabItems[ind].grab(this.playe, false)) {
+                    else if (this.player.grabItems[ind].grab(this.player, false)) {
                         this.grid.push(
                             this.player.gy + y,
                             this.player.gx + x,
