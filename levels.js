@@ -216,73 +216,93 @@ class Level extends GameState {
         }
         this.lastTime = t;
     }
+    
+    grab (angle) {
+        var ind = (8 + angle - this.player.startAngle) % 8;
+        var [x,y] = this.player.dirs[angle];
+        if (this.player.grabItems[ind] === null){
+            if (this.grid.grabbable(
+                this.player.gy + y,
+                this.player.gx + x
+            )){
+                if (this.grid.peek(
+                    this.player.gy + y,
+                    this.player.gx + x
+                ).grab(this.player, true)) {
+                    this.player.grabItems[ind] = this.grid.pop(
+                        this.player.gy + y,
+                        this.player.gx + x
+                    );
+                }
+            }
+        }
+        else if (this.player.grabItems[ind].grab(this.player, false)) {
+            this.grid.push(
+                this.player.gy + y,
+                this.player.gx + x,
+                this.player.grabItems[ind]
+            );
+            this.player.grabItems[ind] = null;
+        }
+    }
 
     keydown (ev) {
-        if (ev.code === "ArrowLeft") {
+        if (ev.code === this.world.keys.left) {
             if (!this.grid.collide(-1, 0, 0, this.player)){
                 this.player.gx--;
             }
         }
-        else if (ev.code === "ArrowRight") {
+        else if (ev.code === this.world.keys.right) {
             if (!this.grid.collide(1, 0, 0, this.player)){
                 this.player.gx++;
             }
         }
-        else if (ev.code === "ArrowUp") {
+        else if (ev.code === this.world.keys.up) {
             if (!this.grid.collide(0, -1, 0, this.player)){
                 this.player.gy--;
             }
         }
-        else if (ev.code === "ArrowDown") {
+        else if (ev.code === this.world.keys.down) {
             if (!this.grid.collide(0, 1, 0, this.player)){
                 this.player.gy++;
             }
         }
-        else if (ev.code === "KeyS") {
+        else if (ev.code === this.world.keys.spinCC) {
             if (!this.grid.collide(0, 0, -1, this.player)){
                 this.player.startAngle = (this.player.startAngle + 7) % 8
             }
         }
-        else if (ev.code === "KeyF") {
+        else if (ev.code === this.world.keys.spinACC) {
             if (!this.grid.collide(0, 0, 1, this.player)){
                 this.player.startAngle = (this.player.startAngle + 1) % 8
             }
         }
-        else if (ev.code === "KeyR") {
+        else if (ev.code === this.world.keys.reset) {
             this.reset();
         }
-        else {
-            for (var i = 0; i < 8; i++){
-                if (ev.code === "Key" + "DCXZAQWE"[i]) {
-                    var ind = (8 + i - this.player.startAngle) % 8;
-                    var [x,y] = this.player.dirs[i];
-                    if (this.player.grabItems[ind] === null){
-                        if (this.grid.grabbable(
-                            this.player.gy + y,
-                            this.player.gx + x
-                        )){
-                            if (this.grid.peek(
-                                this.player.gy + y,
-                                this.player.gx + x
-                            ).grab(this.player, true)) {
-                                this.player.grabItems[ind] = this.grid.pop(
-                                    this.player.gy + y,
-                                    this.player.gx + x
-                                );
-                            }
-                        }
-                    }
-                    else if (this.player.grabItems[ind].grab(this.playe, false)) {
-                        this.grid.push(
-                            this.player.gy + y,
-                            this.player.gx + x,
-                            this.player.grabItems[ind]
-                        );
-                        this.player.grabItems[ind] = null;
-                    }
-                    break;
-                }
-            }
+        else if (ev.code === this.world.keys.legE) {
+            this.grab(0);
+        }
+        else if (ev.code === this.world.keys.legSE) {
+            this.grab(1);
+        }
+        else if (ev.code === this.world.keys.legS) {
+            this.grab(2);
+        }
+        else if (ev.code === this.world.keys.legSW) {
+            this.grab(3);
+        }
+        else if (ev.code === this.world.keys.legW) {
+            this.grab(4);
+        }
+        else if (ev.code === this.world.keys.legNW) {
+            this.grab(5);
+        }
+        else if (ev.code === this.world.keys.legN) {
+            this.grab(6);
+        }
+        else if (ev.code === this.world.keys.legNE) {
+            this.grab(7);
         }
         console.log(this.player.startAngle, this.player.grabItems);
         return false;
@@ -403,6 +423,25 @@ function gateTest (item, pos, level) {
 
 world = {
     states: new OptSet(),
+    keys: {
+        confirm: "Space",
+        back: "Escape",
+        up: "ArrowUp",
+        down: "ArrowDown",
+        left: "ArrowLeft",
+        right: "ArrowRight",
+        legN: "KeyW",
+        legNE: "KeyE",
+        legE: "KeyD",
+        legSE: "KeyC",
+        legS: "KeyX",
+        legSW: "KeyZ",
+        legW: "KeyA",
+        legNW: "KeyQ",
+        spinCC: "KeyS",
+        spinACC: "KeyF",
+        reset: "KeyR",
+    },
 }
 maps = [
     [ // Level 0
@@ -426,9 +465,11 @@ levels.push(new Level(ctx,0,0,80,world,maps[0],itemList,
 levels.push(new Level(ctx,0,0,80,world,maps[1],itemList,
     [exitTest, gateTest]));
 
-function setLevel(level, x, y, srcpos, angle, grab) {
+function setLevel(level, x, y, srcpos, angle, grab, nopop) {
+    if (nopop !== true) {
+        states.pop();
+    }
     console.log("setting level to",level,"at",x,y,"with",grab,"at",angle);
-    states.pop();
     levels[level].player.gx = x;
     levels[level].player.gy = y;
     if (grab != null) {

@@ -1,7 +1,49 @@
-let states = [];
+class Menu extends GameState {
+    constructor (ctx, world, map, list) {
+        super(ctx);
+        this.grid = new Grid(ctx, 0, 0, 50, world);
+        this.world = world;
+        this.grid.register(map, list);
+        this.cursor = 0;
+        this.choices = [];
+        this.drawables = [this.grid];
+    }
+    
+    keydown (ev) {
+        if (ev.code == this.world.keys.confirm) {
+            this.choices[this.cursor]();
+        }
+    }
+}
+
+class MainMenu extends Menu {
+    constructor (ctx, world, map, list) {
+        super(ctx, world, map, list);
+        this.choices = [
+            () => {
+                setLevel(0, 3, 0, null, null, null, true);
+            }
+        ];
+        this.drawables = [
+            this.grid,
+        ];
+    }
+}
+
+menuGrid = [
+    [["FL0"], ],
+]
+
+let states = [new MainMenu(ctx, world, menuGrid, itemList)];
 
 function main () {
-    setLevel(0, 3, 0);
+    var keys = window.localStorage.getItem("grabby-keys");
+    if (keys == null) {
+        window.localStorage.setItem("grabby-keys", JSON.stringify(this.world.keys))
+    }
+    else {
+        this.world.keys = JSON.parse(keys);
+    }
     run();
 }
 
@@ -32,8 +74,6 @@ function run (t) {
 }
 
 document.body.onkeydown = function keydown (ev) {
-    if (ev.key == " ")
-        states.pop();
     for (start = states.length - 1; start >= 0; start--) {
         if (states[start].keydown(ev) == false)
             break;
