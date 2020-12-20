@@ -465,9 +465,11 @@ levels.push(new Level(ctx,0,0,80,world,maps[0],itemList,
 levels.push(new Level(ctx,0,0,80,world,maps[1],itemList,
     [exitTest, gateTest]));
 
-function setLevel(level, x, y, srcpos, angle, grab) {
+function setLevel(level, x, y, srcpos, angle, grab, nopop) {
+    if (nopop !== true) {
+        states.pop();
+    }
     console.log("setting level to",level,"at",x,y,"with",grab,"at",angle);
-    states.pop();
     levels[level].player.gx = x;
     levels[level].player.gy = y;
     if (grab != null) {
