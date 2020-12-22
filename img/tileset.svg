@@ -1996,9 +1996,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="380.13832"
-     inkscape:cy="234.98068"
+     inkscape:zoom="11.313709"
+     inkscape:cx="375.55843"
+     inkscape:cy="24.995723"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -2057,6 +2057,19 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="filter:url(#filter1009)">
+    <ellipse
+       style="opacity:0.99;fill:#000000;fill-opacity:0.997386;stroke:none;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="ellipse2229"
+       sodipodi:type="arc"
+       sodipodi:cx="100.65371"
+       sodipodi:cy="5.7529769"
+       sodipodi:rx="3.8162069"
+       sodipodi:ry="1.7842268"
+       sodipodi:start="6.0810802"
+       sodipodi:end="6.0759609"
+       sodipodi:arc-type="arc"
+       d="M 104.39224,5.3948254 A 3.8162069,1.7842268 0 0 1 101.42453,7.500428 3.8162069,1.7842268 0 0 1 96.91715,6.1156012 3.8162069,1.7842268 0 0 1 99.873326,4.0064539 3.8162069,1.7842268 0 0 1 104.38827,5.3858821"
+       sodipodi:open="true" />
     <image
        width="6.8374944"
        height="7.5541244"
