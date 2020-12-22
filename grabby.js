@@ -21,7 +21,8 @@ class MainMenu extends Menu {
         super(ctx, world, map, list);
         this.choices = [
             () => {
-                setLevel(0, 3, 0, null, null, null, true);
+                // setLevel(0, 3, 3, null, null, null, true);
+                setLevel(0, 8, 3, null, null, null, true);
             }
         ];
         this.drawables = [
@@ -37,6 +38,7 @@ menuGrid = [
 let states = [new MainMenu(ctx, world, menuGrid, itemList)];
 
 function main () {
+    log = document.getElementById("debug");
     var keys = window.localStorage.getItem("grabby-keys");
     if (keys == null) {
         window.localStorage.setItem("grabby-keys", JSON.stringify(this.world.keys))
