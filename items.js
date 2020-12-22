@@ -245,12 +245,10 @@ class Player extends Item {
     constructor (ctx, x, y, len) {
         super(ctx, "Player", x, y, len);
         this.passable = true;
-        var path = "m0-30a30 30 0 1 1 0 60a30 30 0 1 1 0-60";
-        this.body = new Path(ctx, null, null, path, "purple", null);
+        this.body = new Sprite(ctx, "img/tileset.png", 0, 100, len, len, null, null, len, len);
         this.legs = [
-            new Path(ctx, null, null, "m0 0h50", null, "purple"),
-            new Path(ctx, null, null, "m0 0h130", null, "purple"),
-            new Path(ctx, null, null, "m0 30l80 30M0 60L80 30", null, "purple"),
+            new Sprite(ctx, "img/tileset.png", 0, 150, 0, 10, 0, 0, 0, 10),
+            new Sprite(ctx, "img/tileset.png", 50, 100, 50, 50, 0, 0, len, len),
         ];
         this.grabItems = [null, null, null, null, null, null, null, null];
         this.saveItems = null;
@@ -337,7 +335,15 @@ class Player extends Item {
             this.ctx.save();
             this.ctx.translate(this.len/2, this.len/2);
             this.ctx.rotate(angle);
-            this.legs[item===null?0:1].draw();
+            if (item == null) {
+                this.legs[0].sw = this.legs[0].w = 25;
+                this.legs[0].sx = 50;
+            }
+            else {
+                this.legs[0].sw = this.legs[0].w = 75;
+                this.legs[0].sx = 0;
+            }
+            this.legs[0].draw();
             this.ctx.restore();
             if (item !== null) {
                 this.ctx.save();
@@ -346,12 +352,11 @@ class Player extends Item {
                     this.len * (item.gx - this.gx),
                     this.len * (item.gy - this.gy)
                 )
-                this.legs[2].draw();
+                this.legs[1].draw();
                 this.ctx.restore();
             }
         }
         this.ctx.save();
-        this.ctx.translate(this.len/2, this.len/2);
         this.body.draw();
         this.ctx.restore();
         this.ctx.restore();
@@ -379,8 +384,7 @@ itemList = new Map([
         "WL0", [
             [Wall], 
             [
-                ["P", (len)=>["m0 0h","v","h-","z"].join(len), "#aad", null],
-                ["P", (len)=>["m10 10h","v","h-","z"].join(len-20), "#77a", null],
+                ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
             ]
         ]
     ],
@@ -412,9 +416,7 @@ itemList = new Map([
         "BOX", [
             [Item, "Box", true, false, false], 
             [
-                ["P", (len)=>`m10 10h${len-20}v${len-20}H10z`, "#d47912", null],
-                ["P", (len)=>`m30 20h${len-50}v${len-50}zM20 30v${len-50}h${len-50}z`, "#f89c67", null],
-                ["P", (len)=>`m20 20h${len-40}v${len-40}H20z`, null, "#f89c67"],
+                ["S", "img/tileset.png", (x,y,len)=>[300, 0, len, len, x, y, len, len]],
             ]
         ]
     ],
@@ -465,8 +467,38 @@ itemList = new Map([
     [
         "EXT", [
             [Exit], 
+            []
+        ]
+    ],
+    [
+        "DrN", [
+            [Floor], 
             [
-                ["P", (len)=>["M5 5L"," ","M"," 5L5 ",""].join(len-5), null, "red"],
+                ["S", "img/tileset.png", (x,y,len)=>[100, 100, len, len, x, y, len, len]],
+            ]
+        ]
+    ],
+    [
+        "DrE", [
+            [Floor], 
+            [
+                ["S", "img/tileset.png", (x,y,len)=>[150, 100, len, len, x, y, len, len]],
+            ]
+        ]
+    ],
+    [
+        "DrW", [
+            [Floor], 
+            [
+                ["S", "img/tileset.png", (x,y,len)=>[100, 150, len, len, x, y, len, len]],
+            ]
+        ]
+    ],
+    [
+        "DrS", [
+            [Floor], 
+            [
+                ["S", "img/tileset.png", (x,y,len)=>[150, 150, len, len, x, y, len, len]],
             ]
         ]
     ],

@@ -37,8 +37,9 @@ class Grid extends DrawableGroup {
                             }
                             else if (func == "S") {
                                 item.drawables.push(new Sprite(
-                                    this.ctx, spec, 
-                                    this.len * c, this.len * r, ...args
+                                    this.ctx, spec, ...args[0](
+                                        this.len * c, this.len * r, this.len
+                                    )
                                 ));
                             }
                         })
@@ -448,7 +449,7 @@ maps = [
         [["FL1","SPN"], ["WL0"], ["FL1"], ["FL0"], ["FL1",["EGT",true,2]], ["FL0",["EGT",false,2]], ["WL0"], ["FL0",["WSW",false,2]], ],
         [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
         [["WL0"], ["WL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ["FL0"], ],
-        [["FL0",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","BOX"], ["FL1"], ["FL0",["FSW",false,1]], ["FL1",["EGT",false,1]], ["FL0",["EGT",true,1]], ["FL1"], ],
+        [["FL0","DrW",["EXT",1,3,0,2]], ["FL1","PUD"], ["FL0","BOX"], ["FL1"], ["FL0",["FSW",false,1]], ["FL1",["EGT",false,1]], ["FL0",["EGT",true,1]], ["FL1"], ],
     ],
     [ // Level 1
         [["FL1"], null   , ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["WL0"], ],
@@ -460,9 +461,9 @@ maps = [
     ]
 ]
 
-levels.push(new Level(ctx,0,0,80,world,maps[0],itemList,
+levels.push(new Level(ctx,0,0,50,world,maps[0],itemList,
     [exitTest,soakTest,floorSwitchTest,eGateTest]));
-levels.push(new Level(ctx,0,0,80,world,maps[1],itemList,
+levels.push(new Level(ctx,0,0,50,world,maps[1],itemList,
     [exitTest, gateTest]));
 
 function setLevel(level, x, y, srcpos, angle, grab, nopop) {
