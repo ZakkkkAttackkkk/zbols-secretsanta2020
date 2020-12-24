@@ -1996,9 +1996,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313709"
-     inkscape:cx="375.55843"
-     inkscape:cy="24.995723"
+     inkscape:zoom="2.8284273"
+     inkscape:cx="731.03318"
+     inkscape:cy="338.82332"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -6076,7 +6076,7 @@
     </g>
     <g
        id="g10043"
-       transform="rotate(90,171.79727,39.505599)">
+       transform="rotate(90,171.97917,39.687497)">
       <path
          style="fill:url(#linearGradient10077);fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 161.52813,31.750001 v 5.159375 h 7.67292 v -5.159375 c 0,-3.836459 -7.67292,-3.836459 -7.67292,0 h 7.67292"
@@ -6095,7 +6095,7 @@
     </g>
     <g
        id="g10049"
-       transform="rotate(90,198.2556,39.505599)">
+       transform="rotate(90,198.4375,39.687497)">
       <path
          style="fill:url(#linearGradient10075);fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 187.98646,31.750001 v 5.159375 h 7.67292 v -5.159375 c 0,-3.836459 -7.67292,-3.836459 -7.67292,0 h 7.67292"
@@ -6109,7 +6109,7 @@
     </g>
     <g
        id="g10055"
-       transform="rotate(90,224.71393,39.505596)">
+       transform="rotate(90,224.89583,39.687494)">
       <path
          style="fill:url(#linearGradient10073);fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 214.44479,31.749998 v 5.159375 h 7.67292 v -5.159375 c 0,-3.836459 -7.67292,-3.836459 -7.67292,0 h 7.67292"
@@ -6131,7 +6131,7 @@
     </g>
     <g
        id="g10061"
-       transform="rotate(90,171.79727,65.963929)">
+       transform="rotate(90,171.97917,66.145827)">
       <path
          style="fill:url(#linearGradient10071);fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 161.52813,58.208331 v 5.159375 h 7.67292 v -5.159375 c 0,-3.836459 -7.67292,-3.836459 -7.67292,0 h 7.67292"
@@ -6145,7 +6145,7 @@
     </g>
     <g
        id="g10067"
-       transform="rotate(90,198.2556,65.963929)">
+       transform="rotate(90,198.4375,66.145827)">
       <path
          style="fill:url(#linearGradient10069);fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 187.98646,58.208331 v 5.159375 h 7.67292 v -5.159375 c 0,-3.836459 -7.67292,-3.836459 -7.67292,0 h 7.67292"
@@ -6640,7 +6640,7 @@
     </g>
     <g
        id="g10553"
-       transform="rotate(90,237.9431,79.193104)">
+       transform="rotate(90,238.125,79.375002)">
       <path
          style="fill:url(#linearGradient10663);fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 214.44479,84.666665 v 5.159375 h 7.67292 v -5.159375 c 0,-3.836459 -7.67292,-3.836459 -7.67292,0 h 7.67292"
@@ -7024,7 +7024,7 @@
     </g>
     <g
        id="g10715"
-       transform="rotate(90,237.9431,118.8806)">
+       transform="rotate(90,238.125,119.0625)">
       <path
          style="fill:url(#linearGradient10717);fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 214.44479,124.35417 v 5.15937 h 7.67292 v -5.15937 c 0,-3.83646 -7.67292,-3.83646 -7.67292,0 h 7.67292"
