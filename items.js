@@ -52,8 +52,14 @@ class Item extends DrawableGroup {
         })
     }
 
-    grab (player, state) {
+    grab (player, grid, state) {
         if (this.grabbable) {
+            var cell = grid.cells.get([player.gy, player.gx]);
+            var narrow = cell.some((el) => 
+                el.name == "Narrow Shelf");
+            if (narrow) {
+                return false;
+            }
             this.grabbed = state;
         }
         return this.grabbable;
@@ -120,6 +126,22 @@ class Gate extends Item {
     draw () {
         this.ctx.save();
         this.ctx.translate(this.x, this.y);
+        this.drawables[0].draw();
+        if (!this._state) {
+            this.drawables[1].draw();
+        }
+        this.ctx.restore();
+    }
+}
+
+class EDoor extends Gate {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "E-Door", x, y, len, gx, gy);
+    }
+
+    draw () {
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
         this.drawables[this._state ? 1 : 0].draw();
         this.ctx.restore();
     }
@@ -136,6 +158,33 @@ class Key extends Item {
 
     spec (tag) {
         this.tag = tag;
+        this.coords = [
+            [8, 9],
+            [8, 10],
+            [9, 9],
+            [9, 10],
+            [10, 9],
+            [10, 10],
+            [11, 10],
+            
+            [10, 6],
+            [11, 6],
+            [10, 7],
+            [11, 7],
+            [10, 8],
+            [11, 8],
+            [11, 9],
+            
+            [8, 6],
+            [9, 6],
+            [8, 7],
+            [9, 7],
+            [8, 8],
+            [9, 8],
+        ];
+        
+        this.drawables[0].sx = 50 * this.coords[tag][0];
+        this.drawables[0].sy = 50 * this.coords[tag][1];
     }
 }
 
@@ -147,8 +196,13 @@ class Switch extends Item {
     }
 
     spec (state, tag) {
-        this.state = state;
+        this.state = !!state;
         this.tag = tag;
+        this.drawables.forEach((drbl) => {
+            console.log(drbl,drbl.sy);
+            drbl.sy += 50 * (tag % 5);
+            console.log(drbl,drbl.sy);
+        });
     }
 
     save () {
@@ -195,7 +249,7 @@ class WallSwitch extends Switch {
         this.grabbable = true;
     }
 
-    grab (player, state) {
+    grab (player, grid, state) {
         this.state = !(this.state);
         return false;
     }
@@ -209,7 +263,7 @@ class EGate extends Gate {
     }
 
     spec (inv, tag) {
-        this.inv = inv;
+        this.inv = !!inv;
         this.tag = tag;
     }
 
@@ -219,6 +273,19 @@ class EGate extends Gate {
 
     reset () {
         this.state = this.saveState;
+    }
+    
+    get tag () {
+        return this._tag;
+    }
+    
+    set tag (val) {
+        this._tag = val;
+        if (this.drawables.length) {
+            var gate = this.drawables[1];
+            gate.sx += 100 * (val % 5 % 3);
+            if (val % 5 > 3) gate.sy += 100;
+        }
     }
 
     get state() {
@@ -231,13 +298,6 @@ class EGate extends Gate {
 
     force () {
         this.state = !(this.inv);
-    }
-
-    draw () {
-        this.ctx.save();
-        this.ctx.translate(this.x, this.y);
-        this.drawables[this._state ? 1 : 0].draw();
-        this.ctx.restore();
     }
 }
 
@@ -388,16 +448,16 @@ itemList = new Map([
     ["WSE", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[150, 50, len, len, x, y, len, len]],
     ]]],
-    ["Wl0", [[Wall], [
+    ["CNW", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[200, 0, len, len, x, y, len, len]],
     ]]],
-    ["Wl1", [[Wall], [
+    ["CNE", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[250, 0, len, len, x, y, len, len]],
     ]]],
-    ["Wl2", [[Wall], [
+    ["CSW", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[200, 50, len, len, x, y, len, len]],
     ]]],
-    ["Wl3", [[Wall], [
+    ["CWE", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[250, 50, len, len, x, y, len, len]],
     ]]],
     
@@ -408,33 +468,33 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[300, 50, len, len, x, y, len, len]],
     ]]],
     
-    ["DrN", [[Floor], [
+    ["DrN", [[Floor, "Door"], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[100, 100, len, len, x, y, len, len]],
     ]]],
-    ["DrE", [[Floor], [
+    ["DrE", [[Floor, "Door"], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 0, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[150, 100, len, len, x, y, len, len]],
     ]]],
-    ["DrW", [[Floor], [
+    ["DrW", [[Floor, "Door"], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[100, 150, len, len, x, y, len, len]],
     ]]],
-    ["DrS", [[Floor], [
+    ["DrS", [[Floor, "Door"], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[150, 150, len, len, x, y, len, len]],
     ]]],
     
-    ["BdN", [[Gate, "Board"], [
+    ["BdN", [[Item, "Boarded"], [
         ["S", "img/tileset.png", (x,y,len)=>[200, 100, len, len, x, y, len, len]],
     ]]],
-    ["BdE", [[Gate, "Board"], [
+    ["BdE", [[Item, "Boarded"], [
         ["S", "img/tileset.png", (x,y,len)=>[250, 100, len, len, x, y, len, len]],
     ]]],
-    ["BdS", [[Gate, "Board"], [
+    ["BdS", [[Item, "Boarded"], [
         ["S", "img/tileset.png", (x,y,len)=>[250, 150, len, len, x, y, len, len]],
     ]]],
-    ["BdW", [[Gate, "Board"], [
+    ["BdW", [[Item, "Boarded"], [
         ["S", "img/tileset.png", (x,y,len)=>[200, 150, len, len, x, y, len, len]],
     ]]],
     
@@ -536,50 +596,298 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[350, 450, len, len, x, y, len, len]],
     ]]],
     
+    ["NSW", [[Item, "Narrow Shelf", false, true, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 500, len, len, x, y, len, len]],
+    ]]],
+    ["NSE", [[Item, "Narrow Shelf", false, true, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 500, len, len, x, y, len, len]],
+    ]]],
+    ["NSN", [[Item, "Narrow Shelf", false, true, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[100, 500, len, len, x, y, len, len]],
+    ]]],
+    ["NSS", [[Item, "Narrow Shelf", false, true, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[150, 500, len, len, x, y, len, len]],
+    ]]],
+    
+    ["Vt1", [[Item, "Vent", false, false, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[200, 500, len, len, x, y, len, len]],
+    ]]],
+    ["Vt2", [[Item, "Vent", false, false, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[250, 500, len, len, x, y, len, len]],
+    ]]],
+    ["Vt3", [[Item, "Vent", false, false, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[300, 500, len, len, x, y, len, len]],
+    ]]],
+    ["Vt4", [[Item, "Vent", false, false, false], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 500, len, len, x, y, len, len]],
+    ]]],
+    
+    ["Pud", [[Item, "Puddle"], [
+        ["S", "img/tileset.png", (x,y,len)=>[350, 0, len, len, x, y, len, len]],
+    ]]],
+    ["Mes", [[Item, "Mess"], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 0, len, len, x, y, len, len]],
+    ]]],
+    ["Wir", [[Item, "Wires"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 0, len, len, x, y, len, len]],
+    ]]],
+    ["Brm", [[Item, "Broom", true, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[350, 50, len, len, x, y, len, len]],
+    ]]],
+    ["Mop", [[Item, "Mop", true, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 50, len, len, x, y, len, len]],
+    ]]],
+    
+    ["Ldr", [[Item, "Ladder", true, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 50, len, len, x, y, len, len]],
+    ]]],
+    ["Cbr", [[Item, "Crowbar", true, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 0, len, len, x, y, len, len]],
+    ]]],
+    
+    ["DnC", [[Item, "Drain Cover", false, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 200, len, len, x, y, len, len]],
+    ]]],
+    ["Drn", [[Item, "Drain", false, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 250, len, len, x, y, len, len]],
+    ]]],
+    
+    ["WL1", [[Item, "Wall Ladder", false, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[350, 100, len, len, x, y, len, len]],
+    ]]],
+    ["WL2", [[Item, "Wall Ladder", false, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[350, 150, len, len, x, y, len, len]],
+    ]]],
+    
+    ["XDN", [[EDoor], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 200, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[150, 200, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[250, 200, len, len, x, y, len, len]],
+    ]]],
+    ["XDE", [[EDoor], [
+        ["S", "img/tileset.png", (x,y,len)=>[100, 200, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[200, 200, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[300, 200, len, len, x, y, len, len]],
+    ]]],
+    ["XDW", [[EDoor], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 250, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[150, 250, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[250, 250, len, len, x, y, len, len]],
+    ]]],
+    ["XDS", [[EDoor], [
+        ["S", "img/tileset.png", (x,y,len)=>[100, 250, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[200, 250, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[300, 250, len, len, x, y, len, len]],
+    ]]],
+    
+    ["M1E", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 0, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[250, 200, len, len, x, y, len, len]],
+    ]]],
+    ["M1W", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[250, 250, len, len, x, y, len, len]],
+    ]]],
+    ["M2N", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[300, 200, len, len, x, y, len, len]],
+    ]]],
+    ["M2S", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[300, 250, len, len, x, y, len, len]],
+    ]]],
+    ["M3E", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 0, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[350, 200, len, len, x, y, len, len]],
+    ]]],
+    ["M3W", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[350, 250, len, len, x, y, len, len]],
+    ]]],
+    ["M4E", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 0, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[400, 200, len, len, x, y, len, len]],
+    ]]],
+    ["M4W", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[400, 250, len, len, x, y, len, len]],
+    ]]],
+    ["M5N", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[450, 200, len, len, x, y, len, len]],
+    ]]],
+    ["M5E", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 0, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[500, 200, len, len, x, y, len, len]],
+    ]]],
+    ["M5W", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[450, 250, len, len, x, y, len, len]],
+    ]]],
+    ["M5S", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[500, 250, len, len, x, y, len, len]],
+    ]]],
+    ["M6N", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[550, 200, len, len, x, y, len, len]],
+    ]]],
+    ["M6S", [[Floor, "E-Door Marker"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[550, 250, len, len, x, y, len, len]],
+    ]]],
+    
+    ["EGN", [[EGate], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[600, 100, len, len, x, y, len, len]],
+    ]]],
+    ["EGE", [[EGate], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[650, 100, len, len, x, y, len, len]],
+    ]]],
+    ["EGW", [[EGate], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[600, 150, len, len, x, y, len, len]],
+    ]]],
+    ["EGS", [[EGate], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[650, 150, len, len, x, y, len, len]],
+    ]]],
+    
+    ["S1W", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[800, 200, len, len, x, y, len, len]],
+    ]]],
+    ["S1E", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[850, 200, len, len, x, y, len, len]],
+    ]]],
+    ["S2N", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[800, 250, len, len, x, y, len, len]],
+    ]]],
+    ["S2S", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[850, 250, len, len, x, y, len, len]],
+    ]]],
+    ["S3N", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[800, 300, len, len, x, y, len, len]],
+    ]]],
+    ["S3S", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[850, 300, len, len, x, y, len, len]],
+    ]]],
+    ["S4N", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[800, 350, len, len, x, y, len, len]],
+    ]]],
+    ["S4E", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[850, 350, len, len, x, y, len, len]],
+    ]]],
+    ["S4W", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[800, 400, len, len, x, y, len, len]],
+    ]]],
+    ["S4S", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[850, 400, len, len, x, y, len, len]],
+    ]]],
+    ["S5N", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[500, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[800, 450, len, len, x, y, len, len]],
+    ]]],
+    ["S5S", [[Gate, "Switch Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[850, 450, len, len, x, y, len, len]],
+    ]]],
+    
+    ["KA1", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KA2", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KA3", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KA4", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KA5", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KA6", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KA7", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KB1", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KB2", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KB3", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KB4", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KB5", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KB6", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    ["KB7", [[Gate, "Key Gate"], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+    ]]],
+    
+    ["Key", [[Key], [
+        ["S", "img/tileset.png", (x,y,len)=>[400, 500, len, len, x, y, len, len]],
+    ]]],
+    ["WSw", [[WallSwitch], [
+        ["S", "img/tileset.png", (x,y,len)=>[600, 300, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[650, 300, len, len, x, y, len, len]],
+    ]]],
+    ["FSw", [[FloorSwitch], [
+        ["S", "img/tileset.png", (x,y,len)=>[700, 300, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[750, 300, len, len, x, y, len, len]],
+    ]]],
+    
     ["FL0", [[Floor], [
         ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#aaa", null],
     ]]],
     ["FL1", [[Floor], [
         ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
     ]]],
-    // ["WL0", [[Wall], [
-    //     ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
-    // ]]],
-    // ["PUD", [[Item, "Puddle", false, false, true], [
-    //     ["P", (len)=>"M39 28A21 10 0 1 1 47 25M28 52A29 15 0 1 1 41 55M50 71A24 12 0 1 1 52 70", "aqua", null],
-    // ]]],
-    // ["SPN", [[Item, "Sponge", true, false, false], [
-    //     ["P", (len)=>"M15 15A21 10 0 1 1 65 15C55 20 55 60 65 65A21 10 0 1 1 15 65C25 60 25 20 15 15", "orange", null],
-    // ]]],
-    // ["CH0", [[Item, "Chair", true, false, false], [
-    //     ["P", (len)=>`m15 10v${len-20}m0-${len/2-10}h40v${len/2-10}`, null, "#d47912"],
-    // ]]],
-    // ["BOX", [[Item, "Box", true, false, false], [
-    //     ["S", "img/tileset.png", (x,y,len)=>[300, 0, len, len, x, y, len, len]],
-    // ]]],
-    // ["WSW", [[WallSwitch], [
-    //     ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "#9a9a9b", null],
-    //     ["P", (len)=>["M0 0H","V","H0Z"].join(len), "#12ef13", null],
-    // ]]],
-    // ["FSW", [[FloorSwitch], [
-    //     ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "#9a9a9b", null],
-    //     ["P", (len)=>["M0 0H","V","H0Z"].join(len), "#12ef13", null],
-    // ]]],
-    // ["EGT", [[EGate], [
-    //     ["P", (len)=>["M15 15H","V","H15Z"].join(len-15), "red", null],
-    //     ["P", ()=>"", null, null],
-    // ]]],
-    // ["GAT", [[Gate], [
-    //     ["P", (len)=>`M0 20H20V${len-20}H0M0 ${len/2}H20M${len} 20h-20V${len-20}h20M${[len,len/2]}h-20M20 20L${[len-20,len-20]}M20 ${len-20}L${len-20} 20`, null, "brown"],
-    //     ["P", (len)=>`M0 20H20V${len-20}H0M0 ${len/2}H20M${len} 20h-20V${len-20}h20M${[len,len/2]}h-20`, null, "brown"],
-    // ]]],
-    // ["KEY", [[Key], [
-    //     ["P", ()=>"M30 45L40 55M30 65L20 55L45 30A5 5 0 1 1 60 15A5 5 0 1 1 45 30", null, "gold"],
-    // ]]],
+    
     ["EXT", [[Exit], [
-        ["P", ()=>"M30 45L40 55M30 65L20 55L45 30A5 5 0 1 1 60 15A5 5 0 1 1 45 30", null, "gold"],
+        ["P", (len)=>`M0 0L${[len,len]}M0 ${len}L${len} 0`, null, "red"],
     ]]],
-    ["END", [[Exit, "Front Door"], [
-        ["P", ()=>"M30 45L40 55M30 65L20 55L45 30A5 5 0 1 1 60 15A5 5 0 1 1 45 30", null, "gold"],
+    ["EX1", [[Exit, "Front Door"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[300, 100, len, len, x, y, len, len]],
+    ]]],
+    ["EX2", [[Exit, "Front Door"], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[300, 150, len, len, x, y, len, len]],
     ]]],
 ])
