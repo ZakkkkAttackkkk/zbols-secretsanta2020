@@ -195,13 +195,10 @@ class Switch extends Item {
         this.saveState = this.tag = null;
     }
 
-    spec (state, tag) {
-        this.state = !!state;
+    spec (tag) {
         this.tag = tag;
         this.drawables.forEach((drbl) => {
-            console.log(drbl,drbl.sy);
             drbl.sy += 50 * (tag % 5);
-            console.log(drbl,drbl.sy);
         });
     }
 
@@ -257,7 +254,7 @@ class WallSwitch extends Switch {
 
 class EGate extends Gate {
     constructor (ctx, name, x, y, len, gx, gy) {
-        super(ctx, name ?? "EGate", x, y, len, gx, gy);
+        super(ctx, name ?? "E-Gate", x, y, len, gx, gy);
         this.inv = false;
         this.state = false;
     }
@@ -662,22 +659,18 @@ itemList = new Map([
     ["XDN", [[EDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 200, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[150, 200, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[250, 200, len, len, x, y, len, len]],
     ]]],
     ["XDE", [[EDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[100, 200, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[200, 200, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[300, 200, len, len, x, y, len, len]],
     ]]],
     ["XDW", [[EDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 250, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[150, 250, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[250, 250, len, len, x, y, len, len]],
     ]]],
     ["XDS", [[EDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[100, 250, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[200, 250, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[300, 250, len, len, x, y, len, len]],
     ]]],
     
     ["M1E", [[Floor, "E-Door Marker"], [

@@ -88,6 +88,20 @@ class Trie {
             trie.forEach(fn, [...key,this.keys[ind]]);
         })
     }
+
+    entries () {
+        return {trie:this,
+            *[Symbol.iterator]() {
+            if (this.trie.data != undefined) {
+                yield [[], this.trie.data];
+            }
+            for (var i = 0; i < this.trie.keys.length; i++){
+                for (var [key, val] of this.trie.values[i].entries()) {
+                    yield [[this.trie.keys[i], ...key], val];
+                }
+            }
+        }}
+    }
 }
 
 class Animation {
