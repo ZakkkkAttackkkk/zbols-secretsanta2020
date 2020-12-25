@@ -376,6 +376,41 @@ function soakTest (item, pos, level) {
     }
 }
 
+function boardedDoorTest (item, pos, level) {
+    if (item.name == "Boarded Door") {
+        return [
+            null,
+            (item, state) => item.state = state,
+            [item, world.states.has(item.tag)]
+        ];
+    }
+}
+
+function crowbarTest (item, pos, level) {
+    if (item.name == "Drain Cover" || item.name == "Boarded Door") {
+        var has = level.player.grabItems.some((grab) => 
+            (grab != null && grab.name == "Crowbar" &&
+            pos[0] == grab.gy && pos[1] == grab.gx)
+        );
+        if (item.name == "Boarded Door") {
+            if (has) {
+                return [
+                    "cell",
+                    (world, item) => world.states.add(item.tag), 
+                    [level.world, item]
+                ];
+            }
+        }
+        else {
+            return [
+                "cell",
+                (pop, grid, pos) => {if (pop) grid.pop(...pos)},
+                [has, level.grid, pos]
+            ];
+        }
+    }
+}
+
 function floorSwitchTest (item, pos, level) {
     if (item.name == "Floor Switch") {
         var cell = level.grid.cells.get(pos);
@@ -408,7 +443,7 @@ function floorSwitchTest (item, pos, level) {
 }
 
 function eGateTest (item, pos, level) {
-    if (item.name == "E-Gate") {
+    if (item.name == "E-Gate" || item.name == "Switch Gate") {
         var cell = level.grid.cells.get(pos);
         if (cell[cell.length-1] != item ||
             (level.player.gx == pos[1] && level.player.gy == pos[0]) ||
@@ -445,6 +480,19 @@ function gateTest (item, pos, level) {
                 ]
             }
         }
+    }
+}
+
+function ventTest (item, pos, level) {
+    if (item.name == "Vent") {
+        log.innerHTML += "vent\n";
+        return [
+            null,
+            (item, state) => {
+                item.passable = state;
+            },
+            [item, level.grid.peek(pos[0]+1, pos[1]).name == "Ladder"]
+        ];
     }
 }
 
@@ -510,7 +558,7 @@ maps = [
         [["FL0", "DrW", ["EXT",0,8,3,4]], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Bx1"], ["FL0", ["EGE", 0, 101]], ["FL1", "DrE", ["EXT",2,1,3,0]], ],
         [["FL1", "WlW"], ["FL0", "Sh0"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Bx2"], ["FL1", "Sh0"], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "DrS", "BdS", ["EXT",8,8,1,2]], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
+        [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", ["BdS", 30], ["EXT",8,8,1,2]], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ],
     [ // 2
         [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ],
@@ -526,27 +574,27 @@ maps = [
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", ["EXT",4,1,4,0]], ],
+        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", ["EXT",4,1,4,0], "M3E", ["XDE", 16]], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ],
     [ // 4
-        [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["EXT",5,1,2,0]], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL0", ["EXT",3,10,4,4]], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN", "Vt4"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], null, null, ["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ],
+        [["FL1", "WlW"], ["FL0", "Tb4"], ["FL1", "Bx1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "CSW"], ["FL1", "WlN"], ["FL0", "WlN", ["WSw", 20]], ["FL1", "CSE"], ["FL0", "Sh4"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL0", "WlW"], ["FL1", "TbC"], ["FL0", "Bx2"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh4"], ["FL0", "Bx2"], ["FL1"], ["FL0"], ["FL1", "Sh8"], ["FL0"], ["FL1", ["EXT",5,1,2,0], "DrE"], ],
+        [["FL1", "WlW"], ["FL0", "Sh0"], ["FL1", "Sh4"], ["FL0"], ["FL1", "Tb0", "Bx1"], ["FL0", "Tb0"], ["FL1"], ["FL0", "Sh8"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Sh8"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL0", ["EXT",3,10,4,4], "M3W", ["XDW", 16]], ["FL1", "Bx1"], ["FL0", "ShC"], ["FL1"], ["FL0", "Tb0"], ["FL1", "Sh0"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1", "Tb1"], ["FL0", "Tb3"], ["FL1", "ShC"], ["FL0"], ["FL1", "WlE"], ],
+        [["FL1", "WlW"], ["FL0"], ["FL1", ["S1W", 1,  20]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", ["S1E", 0, 20]], ["FL1"], ["FL0", "WlE"], ],
         [["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ],
     ],
     [ // 5
         [["FL1", "WNW"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL1", ["EXT",4,12,2,4]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL0", "WlW"], ["FL1", "Tb1"], ["FL0", "Tb2"], ["FL1", "Tb3"], ["FL0", "Sh4"], ["FL1", "Sh1"], ["FL0", "Sh3"], ["FL1", "Sh4"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Sh4"], ["FL1", "Tb0", ["Key", 16]], ["FL0", "WlE"], ],
+        [["FL1", "DrW", ["EXT",4,12,2,2]], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh8"], ["FL0", "Tb1"], ["FL1", "Tb3"], ["FL0", "Sh8"], ["FL1", "Tb1"], ["FL0", "Tb3"], ["FL1", "Sh8"], ["FL0"], ["FL1", "WlE"], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1"], ["FL0", "WlE"], ],
         [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["EXT",13,6,4]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
+        [["FL0", "WlW"], ["FL1", "Bx1"], ["FL0", "Bx1"], ["FL1", "Sh4"], ["FL0"], ["FL1", ["EXT",13,6,4], "Drn", "DrC"], ["FL0"], ["FL1", "Sh4"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "WlE"], ],
+        [["FL1", "WlW"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "ShC"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1", "Cbr"], ["FL0", "Bx2"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ],
     [ // 6
@@ -608,14 +656,14 @@ maps = [
         [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ],
     ],
     [ // 12
-        [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", ["EXT",4,5,1]], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WNE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL1", ["EXT",11,9,5,4]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["EXT",13,1,4,0]], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", ["EXT",20,1,1,2]], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ],
+        [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "Vt1"], ["FL0", "Vt2"], ["FL1", "Vt2"], ["FL0", ["EXT",4,4,1], "Vt2", "Vt4"], ["FL1", "Vt2"], ["FL0", "Vt3"], ["FL1", "WlN"], ["FL0", "WNE"], ],
+        [["FL1", "WlW"], ["FL0", ["FSw", 1200]], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh2"], ["FL0", "Sh3"], ["FL1"], ["FL0", "Sh0"], ["FL1", "Sh4"], ["FL0", ["Key", 15]], ["FL1", "WlE"], ],
+        [["FL0", "WlW"], ["FL1", ["FSw", 1202]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Sh8"], ["FL1", ["EGN", 0, 1204]], ["FL0", "WlE"], ],
+        [["FL1", "WlW"], ["FL0", ["FSw", 1204]], ["FL1"], ["FL0", "Tb1"], ["FL1", "Tb3"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0", ["EGN", 0, 1202]], ["FL1", "WlE"], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["EGN", 0, 1200]], ["FL0", "WlE"], ],
+        [["FL1", "DrW", ["EXT",11,9,5,4]], ["FL0"], ["FL1"], ["FL0", "Sh4"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh2"], ["FL0", "Sh3"], ["FL1"], ["FL0"], ["FL1", ["BdE", 40], ["EXT",13,1,4,0]], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1", "Bx2"], ["FL0", "Ldr"], ["FL1", "Sh0"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", ["EXT",20,1,1,2], "M2S", ["XDS", 15]], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ],
     ],
     [ // 13
         [["FL1", "WNW"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WNE"], ],
@@ -836,15 +884,15 @@ levels = [
     new Level(ctx, 0, 0, 50, world, 0, maps[0], itemList, [
         exitTest]),
     new Level(ctx, 0, 0, 50, world, 1, maps[1], itemList, [
-        exitTest, floorSwitchTest, eGateTest]),
+        exitTest, floorSwitchTest, eGateTest, boardedDoorTest]),
     new Level(ctx, 0, 0, 50, world, 2, maps[2], itemList, [
         exitTest, floorSwitchTest, eGateTest, gateTest]),
     new Level(ctx, 0, 0, 50, world, 3, maps[3], itemList, [
         exitTest]),
     new Level(ctx, 0, 0, 50, world, 4, maps[4], itemList, [
-        exitTest]),
+        exitTest, eGateTest]),
     new Level(ctx, 0, 0, 50, world, 5, maps[5], itemList, [
-        exitTest]),
+        exitTest, crowbarTest]),
     new Level(ctx, 0, 0, 50, world, 6, maps[6], itemList, [
         exitTest]),
     new Level(ctx, 0, 0, 50, world, 7, maps[7], itemList, [
@@ -859,7 +907,7 @@ levels = [
     new Level(ctx, 0, 0, 50, world, 11, maps[11], itemList, [
         exitTest, floorSwitchTest, eGateTest, gateTest]),
     new Level(ctx, 0, 0, 50, world, 12, maps[12], itemList, [
-        exitTest]),
+        exitTest, floorSwitchTest, eGateTest, ventTest, boardedDoorTest]),
     new Level(ctx, 0, 0, 50, world, 13, maps[13], itemList, [
         exitTest]),
     new Level(ctx, 0, 0, 50, world, 14, maps[14], itemList, [
