@@ -23,7 +23,7 @@ class MainMenu extends Menu {
             () => {
                 // setLevel(0, 3, 3, null, null, null, true);
                 // setLevel(0, 8, 3, null, null, null, true);
-                setLevel(10, 3, 3, null, null, null, true);
+                setLevel(11, 3, 3, null, null, null, true);
             }
         ];
         this.drawables = [

@@ -429,7 +429,7 @@ function eGateTest (item, pos, level) {
 }
 
 function gateTest (item, pos, level) {
-    if (item.name == "Gate" || item.name == "E-Door") {
+    if (item.name == "Key Gate" || item.name == "E-Door") {
         for (var i = 0; i < 8; i++) {
             var grab = level.player.grabItems[i];
             if (grab != null &&
@@ -510,16 +510,16 @@ maps = [
         [["FL0", "DrW", ["EXT",0,8,3,4]], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Bx1"], ["FL0", ["EGE", 0, 101]], ["FL1", "DrE", ["EXT",2,1,3,0]], ],
         [["FL1", "WlW"], ["FL0", "Sh0"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Bx2"], ["FL1", "Sh0"], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", ["EXT",8,8,1,2]], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
+        [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "DrS", "BdS", ["EXT",8,8,1,2]], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ],
     [ // 2
         [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "DrW", ["EXT",1,6,3,4]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "DrE", ["EXT",10,1,1,0]], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", ["EXT",9,7,1,2]], ["FL0", "WlS"], ["FL1", "WSE"], ],
+        [["FL1", "WlW"], ["FL0","Bx1"], ["FL1","Bx2"], ["FL0","Bx2"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh2"], ["FL0", "Sh3"], ["FL1", "WlE"], ],
+        [["FL1", "DrW", ["EXT",1,6,3,4]], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["KA1", 0]], ["FL0"], ["FL1", ["EGE", 0, 201]], ["FL0", "DrE", ["EXT",10,1,1,0]], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Sh4"], ["FL1"], ["FL0", "Sh0"], ["FL1", "WlE"], ],
+        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0", ["Key", 0]], ["FL1", "ShC"], ["FL0"], ["FL1", ["FSw", 201]], ["FL0", "WlE"], ],
+        [["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", ["EXT",9,7,1,2], "M6S", ["XDS", 19]], ["FL0", "WlS"], ["FL1", "WSE"], ],
     ],
     [ // 3
         [["FL1", "WNW"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WNE"], ],
@@ -599,12 +599,12 @@ maps = [
     ],
     [ // 11
         [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WNE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL1", ["EXT",10,7,6,4]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["EXT",12,1,5,0]], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh4"], ["FL0", ["EGN", 0, 1101]], ["FL1", ["FSw", 1103]], ["FL0", ["Key", 2]], ["FL1", "Sh0"], ["FL0", "Bx1"], ["FL1", "WlE"], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0", "Bx2"], ["FL1"], ["FL0", "ShC"], ["FL1", ["EGN", 0, 1100]], ["FL0", "Sh1"], ["FL1", "Sh2"], ["FL0", "Sh3"], ["FL1", ["FSw", 1102]], ["FL0", "WlE"], ],
+        [["FL1", ["EXT",10,7,6,4], "M1W", ["XDW", 14]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Bx1"], ["FL1", "WlE"], ],
+        [["FL0", "WlW"], ["FL1", ["EGN", 0, 1102]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh1"], ["FL0", "Sh2"], ["FL1", "Sh3"], ["FL0", "WlE"], ],
+        [["FL1", "WlW"], ["FL0", ["FSw", 1101]], ["FL1", "Tb4"], ["FL0"], ["FL1", "Tb1"], ["FL0", "Tb3"], ["FL1"], ["FL0", ["KA3", 2]], ["FL1", ["EGE", 0, 1103]], ["FL0"], ["FL1", ["EXT",12,1,5,0], "DrE"], ],
+        [["FL0", "WlW"], ["FL1", ["FSw", 1100]], ["FL0", "TbC"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh0"], ["FL0", "Sh0"], ["FL1"], ["FL0", "WlE"], ],
         [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ],
     ],
     [ // 12
@@ -838,7 +838,7 @@ levels = [
     new Level(ctx, 0, 0, 50, world, 1, maps[1], itemList, [
         exitTest, floorSwitchTest, eGateTest]),
     new Level(ctx, 0, 0, 50, world, 2, maps[2], itemList, [
-        exitTest]),
+        exitTest, floorSwitchTest, eGateTest, gateTest]),
     new Level(ctx, 0, 0, 50, world, 3, maps[3], itemList, [
         exitTest]),
     new Level(ctx, 0, 0, 50, world, 4, maps[4], itemList, [
@@ -857,7 +857,7 @@ levels = [
     new Level(ctx, 0, 0, 50, world, 10, maps[10], itemList, [
         exitTest, floorSwitchTest, eGateTest, gateTest]),
     new Level(ctx, 0, 0, 50, world, 11, maps[11], itemList, [
-        exitTest]),
+        exitTest, floorSwitchTest, eGateTest, gateTest]),
     new Level(ctx, 0, 0, 50, world, 12, maps[12], itemList, [
         exitTest]),
     new Level(ctx, 0, 0, 50, world, 13, maps[13], itemList, [

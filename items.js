@@ -281,7 +281,7 @@ class EGate extends Gate {
         if (this.drawables.length) {
             var gate = this.drawables[1];
             gate.sx += 100 * (val % 5 % 3);
-            if (val % 5 > 3) gate.sy += 100;
+            if ((val % 5) >= 3) gate.sy += 100;
         }
     }
 
@@ -802,55 +802,55 @@ itemList = new Map([
     ]]],
     ["KA2", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 400, len, len, x, y, len, len]],
     ]]],
     ["KA3", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 350, len, len, x, y, len, len]],
     ]]],
     ["KA4", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 300, len, len, x, y, len, len]],
     ]]],
     ["KA5", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 250, len, len, x, y, len, len]],
     ]]],
     ["KA6", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 200, len, len, x, y, len, len]],
     ]]],
     ["KA7", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[900, 150, len, len, x, y, len, len]],
     ]]],
     ["KB1", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[950, 450, len, len, x, y, len, len]],
     ]]],
     ["KB2", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[950, 400, len, len, x, y, len, len]],
     ]]],
     ["KB3", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[950, 350, len, len, x, y, len, len]],
     ]]],
     ["KB4", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 100, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[950, 300, len, len, x, y, len, len]],
     ]]],
     ["KB5", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[950, 250, len, len, x, y, len, len]],
     ]]],
     ["KB6", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[950, 200, len, len, x, y, len, len]],
     ]]],
     ["KB7", [[Gate, "Key Gate"], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 100, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[900, 450, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[950, 150, len, len, x, y, len, len]],
     ]]],
     
     ["Key", [[Key], [
