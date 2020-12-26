@@ -110,6 +110,17 @@ class Exit extends Item {
     }
 }
 
+class FrontDoor extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Front Door", x, y, len, gx, gy);
+        this.passable = true;
+        this.dynamic = true;
+    }
+    
+    test (level) {
+    }
+}
+
 class Floor extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Floor", x, y, len, gx, gy);
@@ -121,6 +132,48 @@ class Wall extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Wall", x, y, len, gx, gy);
         this.hoverable = false;
+    }
+}
+
+class Mess extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Mess", x, y, len, gx, gy);
+        this.cleaner = "Cleaner";
+    }
+    
+    test (level) {
+        var has = level.player.grabItems.some((grab) => 
+            grab != null && grab.name == this.cleaner &&
+            grab.gx == this.gx && grab.gy == this.gy
+        , this);
+        if (has) {
+            return [
+                null,
+                (grid) => grid.pop(x, y),
+                [level.grid, this.gx, this.gy]
+            ]
+        }
+    }
+}
+
+class Puddle extends Mess {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Puddle", x, y, len, gx, gy);
+        this.cleaner = "Mop";
+    }
+}
+
+class Trash extends Mess {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Trash", x, y, len, gx, gy);
+        this.cleaner = "Broom";
+    }
+}
+
+class Wires extends Mess {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Live Wires", x, y, len, gx, gy);
+        this.cleaner = "";
     }
 }
 
@@ -300,12 +353,12 @@ class Key extends Item {
         if (gate != null) {
             return [
                 null,
-                (item, player, states) => {
-                    item.state = true;
+                (gate, item, player, states) => {
+                    gate.state = true;
                     player.grabItems[item.grabLeg] = null;
-                    states.add(item.tag);
+                    states.add(gate.tag);
                 },
-                [this, level.player, level.world.states]
+                [gate, this, level.player, level.world.states]
             ]
         }
     }
@@ -365,10 +418,10 @@ class FloorSwitch extends Switch {
         var cell = level.grid.cells.get([this.gy, this.gx]);
         if (cell[cell.length-1] != this || (
                 this.gx == level.player.gx &&
-                this.gx == level.player.gy
+                this.gy == level.player.gy
             ) || level.player.grabItems.some((item) => 
                 item != null && item.gx == this.gx && item.gy == this.gy
-            ), this) {
+            , this)) {
             return [
                 null,
                 (level, item) => {
@@ -451,7 +504,7 @@ class EGate extends Gate {
     
     test (level) {
         var cell = level.grid.cells.get([this.gy, this.gx]);
-        log.innerHTML += `${[]}`
+        log.innerHTML += `${[]}\n`
         if (cell[cell.length-1] != this ||
             (level.player.gx == this.gx && 
             level.player.gy == this.gy) ||
@@ -817,13 +870,13 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[350, 500, len, len, x, y, len, len]],
     ]]],
     
-    ["Pud", [[Item, "Puddle"], [
+    ["Pud", [[Puddle], [
         ["S", "img/tileset.png", (x,y,len)=>[350, 0, len, len, x, y, len, len]],
     ]]],
-    ["Mes", [[Item, "Mess"], [
+    ["Mes", [[Mess], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 0, len, len, x, y, len, len]],
     ]]],
-    ["Wir", [[Item, "Wires"], [
+    ["Wir", [[Wires], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 0, len, len, x, y, len, len]],
     ]]],
     ["Brm", [[Item, "Broom", true, true, true], [
@@ -1073,11 +1126,11 @@ itemList = new Map([
     ["EXT", [[Exit], [
         ["P", (len)=>`M0 0L${[len,len]}M0 ${len}L${len} 0`, null, "red"],
     ]]],
-    ["EX1", [[Exit, "Front Door"], [
+    ["EX1", [[FrontDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[300, 100, len, len, x, y, len, len]],
     ]]],
-    ["EX2", [[Exit, "Front Door"], [
+    ["EX2", [[FrontDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[300, 150, len, len, x, y, len, len]],
     ]]],

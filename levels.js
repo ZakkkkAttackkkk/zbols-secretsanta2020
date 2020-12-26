@@ -231,7 +231,9 @@ class Level extends GameState {
                     fn(...args);
                 });
             }
-            log.innerHTML += `Level ${Math.floor(this.n/8)+1}-${this.n%8+1}: (${[this.player.gx,this.player.gy]})`;
+            log.innerHTML += 
+            `{${this.world.states.values.join(",")}}\n` +
+            `Level ${Math.floor(this.n/8)+1}-${this.n%8+1}: (${[this.player.gx,this.player.gy]})`;
         }
         this.lastTime = t;
     }
