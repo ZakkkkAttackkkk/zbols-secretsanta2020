@@ -12,7 +12,7 @@ class Item extends DrawableGroup {
         this.dynamic = dyn ?? false;
         this.world = null;
         this.sx = this.sy = this.sz = null;
-        this.grabbed = false;
+        this.grabLeg = null;
     }
 
     save (z) {
@@ -52,7 +52,7 @@ class Item extends DrawableGroup {
         })
     }
 
-    grab (player, grid, state) {
+    grab (player, leg, grid, state) {
         if (this.grabbable) {
             var cell = grid.cells.get([player.gy, player.gx]);
             var narrow = cell.some((el) => 
@@ -60,7 +60,7 @@ class Item extends DrawableGroup {
             if (narrow) {
                 return false;
             }
-            this.grabbed = state;
+            this.grabLeg = state ? leg : null;
         }
         return this.grabbable;
     }
@@ -78,6 +78,35 @@ class Exit extends Item {
         this.tx = tx;
         this.ty = ty;
         this.tangle = tang
+    }
+    
+    test (level) {
+        if (this.gx == level.player.gx &&
+            this.gy == level.player.gy) {
+            var count = level.player.grabItems.filter((el)=> el!=null).length;
+            if (count <= (this.tangle == null ? 0 : 1)) {
+                var grab = null, i;
+                if (count > 0) {
+                    for (i = 7; i >= 0; i--) {
+                        if (level.player.grabItems[i] != null) {
+                            grab = level.player.grabItems[i];
+                            break;
+                        }
+                    }
+                }
+                return[
+                    "grid",
+                    (player, i, a, b, c, d, e, grab) => {
+                        player.grabItems[i] = player.gx = player.gy = null;
+                        setLevel(a, b, c, d, e, grab);
+                    },
+                    [
+                        level.player, i, 
+                        this.target, this.tx, this.ty,
+                        [this.gy, this.gx], this.tangle, grab]
+                ];
+            }
+        }
     }
 }
 
@@ -98,7 +127,6 @@ class Wall extends Item {
 class Gate extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Gate", x, y, len, gx, gy);
-        this.hoverable = true;
         this.state = false;
         this.tag = null;
     }
@@ -149,6 +177,14 @@ class BoardedDoor extends Gate {
         }
         this.ctx.restore();
     }
+    
+    test (level) {
+        return [
+            null,
+            (item, state) => item.state = state,
+            [this, level.world.states.has(this.tag)]
+        ];
+    }
 }
 
 class EDoor extends Gate {
@@ -161,6 +197,72 @@ class EDoor extends Gate {
         this.ctx.translate(this.x, this.y);
         this.drawables[this._state ? 1 : 0].draw();
         this.ctx.restore();
+    }
+    
+    test (level) {
+        return [
+            null,
+            (item, state) => {item.state = state},
+            [this, level.world.states.has(this.tag)]
+        ];
+    }
+}
+
+class Vent extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Vent", x, y, len, gx, gy);
+        this.hoverable = false;
+    }
+    
+    test (level) {
+        return [
+            null,
+            (item, state) => {
+                item.passable = state;
+            },
+            [this, level.grid.peek(this.gy+1, this.gx).name == "Ladder"]
+        ];
+    }
+}
+
+class DrainCover extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Drain Cover", x, y, len, gx, gy);
+        this.passable = true;
+        this.tag = 90;
+    }
+    
+    test (level) {
+        var ret = [
+            "cell",
+            (pop, grid, x, y) => {if (pop) grid.pop(x, y)},
+            [level.world.states.has(this.tag), level.grid, this.gx, this.gy]
+        ];
+        log.innerHTML += `${ret}\n`;
+        return ret;
+    }
+}
+
+class Crowbar extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Crowbar", x, y, len, gx, gy);
+        this.grabbable = true;
+        this.hoverable = true;
+    }
+    
+    test (level) {
+        var cell = level.grid.cells.get([this.gy, this.gx]);
+        log.innerHTML += `${cell.map((el)=>el.name).join(",")}\n`;
+        var gate = cell.find((item) => 
+            item.name == "Drain Cover" || item.name == "Boarded Door"
+        );
+        if (gate != null) {
+            return [
+                "cell",
+                (world, tag) => world.states.add(tag), 
+                [level.world, gate.tag]
+            ]
+        }
     }
 }
 
@@ -176,32 +278,36 @@ class Key extends Item {
     spec (tag) {
         this.tag = tag;
         this.coords = [
-            [8, 9],
-            [8, 10],
-            [9, 9],
-            [9, 10],
-            [10, 9],
-            [10, 10],
-            [11, 10],
+            [8, 9], [8, 10], [9, 9], [9, 10],
+            [10, 9], [10, 10], [11, 10],
             
-            [10, 6],
-            [11, 6],
-            [10, 7],
-            [11, 7],
-            [10, 8],
-            [11, 8],
-            [11, 9],
+            [10, 6], [11, 6], [10, 7], [11, 7],
+            [10, 8], [11, 8], [11, 9],
             
-            [8, 6],
-            [9, 6],
-            [8, 7],
-            [9, 7],
-            [8, 8],
-            [9, 8],
+            [8, 6], [9, 6], [8, 7],
+            [9, 7], [8, 8], [9, 8],
         ];
         
         this.drawables[0].sx = 50 * this.coords[tag][0];
         this.drawables[0].sy = 50 * this.coords[tag][1];
+    }
+    
+    test (level) {
+        var cell = level.grid.cells.get([this.gy, this.gx]);
+        var gate = cell.find((item) => 
+            item.name == "Key Gate" || item.name == "E-Door"
+        );
+        if (gate != null) {
+            return [
+                null,
+                (item, player, states) => {
+                    item.state = true;
+                    player.grabItems[item.grabLeg] = null;
+                    states.add(item.tag);
+                },
+                [this, level.player, level.world.states]
+            ]
+        }
     }
 }
 
@@ -254,6 +360,35 @@ class FloorSwitch extends Switch {
         super(ctx, name ?? "Floor Switch", x, y, len, gx, gy);
         this.passable = true;
     }
+    
+    test (level) {
+        var cell = level.grid.cells.get([this.gy, this.gx]);
+        if (cell[cell.length-1] != this || (
+                this.gx == level.player.gx &&
+                this.gx == level.player.gy
+            ) || level.player.grabItems.some((item) => 
+                item != null && item.gx == this.gx && item.gy == this.gy
+            ), this) {
+            return [
+                null,
+                (level, item) => {
+                    level.world.states.add(item.tag);
+                    item.state = true;
+                }, 
+                [level, this]
+            ];
+        }
+        else {
+            return [
+                null,
+                (level, item) => {
+                    level.world.states.remove(item.tag);
+                    item.state = false;
+                },
+                [level, this]
+            ];
+        }
+    }
 }
 
 class WallSwitch extends Switch {
@@ -263,7 +398,7 @@ class WallSwitch extends Switch {
         this.grabbable = true;
     }
 
-    grab (player, grid, state) {
+    grab (player, leg, grid, state) {
         this.state = !(this.state);
         return false;
     }
@@ -312,6 +447,27 @@ class EGate extends Gate {
 
     force () {
         this.state = !(this.inv);
+    }
+    
+    test (level) {
+        var cell = level.grid.cells.get([this.gy, this.gx]);
+        log.innerHTML += `${[]}`
+        if (cell[cell.length-1] != this ||
+            (level.player.gx == this.gx && 
+            level.player.gy == this.gy) ||
+            level.player.grabItems.some((item) => 
+                item != null && item.gx == this.gx && item.gy == this.gy
+            , this))
+            return [
+                null,
+                (itm) => itm.force(),
+                [this]
+            ];
+        else return [
+            null,
+            (item, state) => {item.state = state},
+            [this,level.world.states.has(this.tag)]
+        ];
     }
 }
 
@@ -645,19 +801,19 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[150, 500, len, len, x, y, len, len]],
     ]]],
     
-    ["Vt1", [[Item, "Vent", false, false, false], [
+    ["Vt1", [[Vent], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[200, 500, len, len, x, y, len, len]],
     ]]],
-    ["Vt2", [[Item, "Vent", false, false, false], [
+    ["Vt2", [[Vent], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[250, 500, len, len, x, y, len, len]],
     ]]],
-    ["Vt3", [[Item, "Vent", false, false, false], [
+    ["Vt3", [[Vent], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[300, 500, len, len, x, y, len, len]],
     ]]],
-    ["Vt4", [[Item, "Vent", false, false, false], [
+    ["Vt4", [[Vent], [
         ["S", "img/tileset.png", (x,y,len)=>[350, 500, len, len, x, y, len, len]],
     ]]],
     
@@ -680,11 +836,11 @@ itemList = new Map([
     ["Ldr", [[Item, "Ladder", true, true, true], [
         ["S", "img/tileset.png", (x,y,len)=>[450, 50, len, len, x, y, len, len]],
     ]]],
-    ["Cbr", [[Item, "Crowbar", true, true, true], [
+    ["Cbr", [[Crowbar], [
         ["S", "img/tileset.png", (x,y,len)=>[500, 0, len, len, x, y, len, len]],
     ]]],
     
-    ["DrC", [[Item, "Drain Cover", false, true, true], [
+    ["DrC", [[DrainCover], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 200, len, len, x, y, len, len]],
     ]]],
     ["Drn", [[Item, "Drain", false, true, true], [
