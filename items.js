@@ -300,15 +300,15 @@ class Crowbar extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Crowbar", x, y, len, gx, gy);
         this.grabbable = true;
-        this.hoverable = true;
+        this.passable = true;
     }
     
     test (level) {
         var cell = level.grid.cells.get([this.gy, this.gx]);
-        log.innerHTML += `${cell.map((el)=>el.name).join(",")}\n`;
         var gate = cell.find((item) => 
             item.name == "Drain Cover" || item.name == "Boarded Door"
         );
+        log.innerHTML += `${cell.map((el)=>el.name).join(",")} | ${gate?.name}\n`;
         if (gate != null) {
             return [
                 "cell",
@@ -348,8 +348,10 @@ class Key extends Item {
     test (level) {
         var cell = level.grid.cells.get([this.gy, this.gx]);
         var gate = cell.find((item) => 
-            item.name == "Key Gate" || item.name == "E-Door"
-        );
+            (item.name == "Key Gate" || item.name == "E-Door") &&
+            Math.floor(item.tag) == this.tag &&
+            !level.world.states.has(item.tag)
+        , this);
         if (gate != null) {
             return [
                 null,
@@ -732,12 +734,12 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[150, 100, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[250, 100, len, len, x, y, len, len]],
     ]]],
-    ["BdS", [[BoardedDoor], [
+    ["BdW", [[BoardedDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[100, 150, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[250, 150, len, len, x, y, len, len]],
     ]]],
-    ["BdW", [[BoardedDoor], [
+    ["BdS", [[BoardedDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[150, 150, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[200, 150, len, len, x, y, len, len]],
@@ -1014,11 +1016,11 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[850, 250, len, len, x, y, len, len]],
     ]]],
-    ["S3N", [[SwitchGate], [
+    ["S3W", [[SwitchGate], [
         ["S", "img/tileset.png", (x,y,len)=>[500, 100, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[800, 300, len, len, x, y, len, len]],
     ]]],
-    ["S3S", [[SwitchGate], [
+    ["S3E", [[SwitchGate], [
         ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[850, 300, len, len, x, y, len, len]],
     ]]],
@@ -1092,7 +1094,7 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[950, 300, len, len, x, y, len, len]],
     ]]],
     ["KB5", [[Gate, "Key Gate"], [
-        ["S", "img/tileset.png", (x,y,len)=>[450, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[950, 250, len, len, x, y, len, len]],
     ]]],
     ["KB6", [[Gate, "Key Gate"], [
