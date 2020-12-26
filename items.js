@@ -148,13 +148,22 @@ class Mess extends Item {
     test (level) {
         var has = level.player.grabItems.some((grab) => 
             grab != null && grab.name == this.cleaner &&
-            grab.gx == this.gx && grab.gy == this.gy
-        , this);
-        if (has) {
+            grab.gx == this.gx && grab.gy == this.gy,
+            this);
+        var set = level.grid.cells.get([this.gy, this.gx]).some((item) => 
+            item.name == "Ladder");
+        var held = level.player.grabItems.some((item) => 
+            item != null && item.name == "Ladder" &&
+            item.gx == this.gx && item.gy == this.gy,
+            this);
+        if (has || set || held) {
             return [
                 null,
-                (grid, x, y) => grid.pop(y, x),
-                [level.grid, this.gx, this.gy]
+                (grid, x, y, pop, item, pass) => {
+                    if (pop) grid.pop(y, x);
+                    item.passable = pass;
+                },
+                [level.grid, this.gx, this.gy, has, this, set || held]
             ]
         }
     }
@@ -354,8 +363,8 @@ class Key extends Item {
         var gate = cell.find((item) => 
             (item.name == "Key Gate" || item.name == "E-Door") &&
             Math.floor(item.tag) == this.tag &&
-            !level.world.states.has(item.tag)
-        , this);
+            !item.state,
+            this);
         if (gate != null) {
             console.log(this.grabLeg);
             return [
@@ -551,7 +560,7 @@ class Player extends Item {
         this.passable = true;
         this.body = new Sprite(ctx, "img/tileset.png", 0, 100, len, len, null, null, len, len);
         this.legs = [
-            new Sprite(ctx, "img/tileset.png", 0, 150, 0, 10, 0, 0, 0, 10),
+            new Sprite(ctx, "img/tileset.png", 0, 150, 0, 15, 0, 0, 0, 15),
             new Sprite(ctx, "img/tileset.png", 50, 100, 50, 50, 0, 0, len, len),
         ];
         this.grabItems = [null, null, null, null, null, null, null, null];
@@ -568,6 +577,7 @@ class Player extends Item {
     save () {
         this.sx = this._gx;
         this.sy = this._gy;
+        this.grabItems.forEach((grab) => grab?.save());
         this.saveItems = this.grabItems.slice();
         this.saveAngle = this._startAngle;
     }
@@ -577,6 +587,7 @@ class Player extends Item {
         this.gy = this.sy;
         this._startAngle = this.saveAngle;
         this.grabItems = this.saveItems.slice();
+        this.grabItems.forEach((grab) => grab?.reset());
     }
 
     get startAngle () {
@@ -742,12 +753,12 @@ itemList = new Map([
     ["BdW", [[BoardedDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[100, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[250, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[200, 150, len, len, x, y, len, len]],
     ]]],
     ["BdS", [[BoardedDoor], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[150, 150, len, len, x, y, len, len]],
-        ["S", "img/tileset.png", (x,y,len)=>[200, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[250, 150, len, len, x, y, len, len]],
     ]]],
     
     ["Sh0", [[Wall, "Shelf"], [
@@ -1132,15 +1143,13 @@ itemList = new Map([
         ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
     ]]],
     
-    ["EXT", [[Exit], [
-        ["P", (len)=>`M0 0L${[len,len]}M0 ${len}L${len} 0`, null, "red"],
-    ]]],
+    ["EXT", [[Exit], []]],
     ["EX1", [[FrontDoor], [
-        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[50, 0, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[300, 100, len, len, x, y, len, len]],
     ]]],
     ["EX2", [[FrontDoor], [
-        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[50, 0, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[300, 150, len, len, x, y, len, len]],
     ]]],
 ])
