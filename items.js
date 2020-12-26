@@ -96,12 +96,16 @@ class Exit extends Item {
                 }
                 return[
                     "grid",
-                    (player, i, a, b, c, d, e, grab) => {
-                        player.grabItems[i] = player.gx = player.gy = null;
+                    (level, i, a, b, c, d, e, grab) => {
+                        if (i != null) {
+                            grab.grab(level.player, i, level.grid, false);
+                            level.player.grabItems[i] = null;
+                        }
+                        level.player.gx = level.player.gy = null;
                         setLevel(a, b, c, d, e, grab);
                     },
                     [
-                        level.player, i, 
+                        level, i, 
                         this.target, this.tx, this.ty,
                         [this.gy, this.gx], this.tangle, grab]
                 ];
@@ -149,7 +153,7 @@ class Mess extends Item {
         if (has) {
             return [
                 null,
-                (grid) => grid.pop(x, y),
+                (grid, x, y) => grid.pop(y, x),
                 [level.grid, this.gx, this.gy]
             ]
         }
@@ -353,6 +357,7 @@ class Key extends Item {
             !level.world.states.has(item.tag)
         , this);
         if (gate != null) {
+            console.log(this.grabLeg);
             return [
                 null,
                 (gate, item, player, states) => {
@@ -875,7 +880,7 @@ itemList = new Map([
     ["Pud", [[Puddle], [
         ["S", "img/tileset.png", (x,y,len)=>[350, 0, len, len, x, y, len, len]],
     ]]],
-    ["Mes", [[Mess], [
+    ["Tra", [[Trash], [
         ["S", "img/tileset.png", (x,y,len)=>[400, 0, len, len, x, y, len, len]],
     ]]],
     ["Wir", [[Wires], [
@@ -903,9 +908,11 @@ itemList = new Map([
     ]]],
     
     ["WL1", [[Item, "Wall Ladder", false, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[350, 100, len, len, x, y, len, len]],
     ]]],
     ["WL2", [[Item, "Wall Ladder", false, true, true], [
+        ["S", "img/tileset.png", (x,y,len)=>[50, 50, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[350, 150, len, len, x, y, len, len]],
     ]]],
     
@@ -1017,11 +1024,11 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[850, 250, len, len, x, y, len, len]],
     ]]],
     ["S3W", [[SwitchGate], [
-        ["S", "img/tileset.png", (x,y,len)=>[500, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[500, 150, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[800, 300, len, len, x, y, len, len]],
     ]]],
     ["S3E", [[SwitchGate], [
-        ["S", "img/tileset.png", (x,y,len)=>[550, 150, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[550, 100, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[850, 300, len, len, x, y, len, len]],
     ]]],
     ["S4N", [[SwitchGate], [
