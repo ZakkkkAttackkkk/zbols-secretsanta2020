@@ -887,7 +887,7 @@ itemList = new Map([
         ["S", "img/tileset.png", (x,y,len)=>[950, 250, len, len, x, y, len, len]],
     ]]],
     ["KB6", [[Gate, "Key Gate"], [
-        ["S", "img/tileset.png", (x,y,len)=>[450, 100, len, len, x, y, len, len]],
+        ["S", "img/tileset.png", (x,y,len)=>[400, 100, len, len, x, y, len, len]],
         ["S", "img/tileset.png", (x,y,len)=>[950, 200, len, len, x, y, len, len]],
     ]]],
     ["KB7", [[Gate, "Key Gate"], [

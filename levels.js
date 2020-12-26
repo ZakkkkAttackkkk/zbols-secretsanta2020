@@ -463,7 +463,17 @@ function eGateTest (item, pos, level) {
     }
 }
 
-function gateTest (item, pos, level) {
+function eDoorTest (item, pos, level) {
+    if (item.name == "E-Door") {
+        return [
+            null,
+            (item, state) => {item.state = state},
+            [item,level.world.states.has(item.tag)]
+        ];
+    }
+}
+
+function keyTest (item, pos, level) {
     if (item.name == "Key Gate" || item.name == "E-Door") {
         for (var i = 0; i < 8; i++) {
             var grab = level.player.grabItems[i];
@@ -472,11 +482,12 @@ function gateTest (item, pos, level) {
                 grab.gx == pos[1] && grab.gy == pos[0]) {
                 return [
                     null,
-                    (item, player, i) => {
+                    (item, player, i, states) => {
                         item.state = true;
                         player.grabItems[i] = null;
+                        states.add(item.tag);
                     },
-                    [item, level.player, i]
+                    [item, level.player, i, level.world.states]
                 ]
             }
         }
@@ -538,7 +549,7 @@ world = {
 
 // levels = [
 //     new Level(ctx,0,0,50,world,maps[0],itemList,[exitTest,soakTest,floorSwitchTest,eGateTest]),
-//     new Level(ctx,0,0,50,world,maps[1],itemList,[exitTest, gateTest]),
+//     new Level(ctx,0,0,50,world,maps[1],itemList,[exitTest, keyTest]),
 // ];
 
 maps = [
@@ -571,11 +582,11 @@ maps = [
     ],
     [ // 3
         [["FL1", "WNW"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WNE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", ["EXT",4,1,4,0], "M3E", ["XDE", 16]], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0", "Tb1"], ["FL1", "Tb3"], ["FL0", ["FSw", 304]], ["FL1", "Tb0"], ["FL0"], ["FL1", ["Key", 12]], ["FL0", "Sh4"], ["FL1", "Tb4"], ["FL0"], ["FL1", "WlE"], ],
+        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh8"], ["FL0", "Tb8"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL0", "WlW"], ["FL1", ["EGS", 0, 304]], ["FL0", "Sh4"], ["FL1", ["FSw", 303]], ["FL0", "Sh4"], ["FL1", "Sh1"], ["FL0", "Sh3"], ["FL1"], ["FL0", "Sh8"], ["FL1", "Tb8"], ["FL0"], ["FL1", "WlE"], ],
+        [["FL1", "WlW"], ["FL0", ["KB6", 12]], ["FL1", "Sh8"], ["FL0", ["EGN", 0, 303]], ["FL1", "ShC"], ["FL0", "Bx2"], ["FL1", "Sh0"], ["FL0"], ["FL1", "ShC"], ["FL0", "TbC"], ["FL1"], ["FL0", ["EXT",4,1,4,0], "M3E", ["XDE", 16]], ],
+        [["FL0", "WlW", ["WSw", 21]], ["FL1"], ["FL0", "ShC"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "NSN"], ["FL1"], ["FL0", "NSN"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ],
     [ // 4
@@ -886,11 +897,11 @@ levels = [
     new Level(ctx, 0, 0, 50, world, 1, maps[1], itemList, [
         exitTest, floorSwitchTest, eGateTest, boardedDoorTest]),
     new Level(ctx, 0, 0, 50, world, 2, maps[2], itemList, [
-        exitTest, floorSwitchTest, eGateTest, gateTest]),
+        exitTest, floorSwitchTest, eGateTest, keyTest]),
     new Level(ctx, 0, 0, 50, world, 3, maps[3], itemList, [
-        exitTest]),
+        exitTest, floorSwitchTest, eGateTest, eDoorTest, keyTest]),
     new Level(ctx, 0, 0, 50, world, 4, maps[4], itemList, [
-        exitTest, eGateTest]),
+        exitTest, eGateTest, eDoorTest, keyTest]),
     new Level(ctx, 0, 0, 50, world, 5, maps[5], itemList, [
         exitTest, crowbarTest]),
     new Level(ctx, 0, 0, 50, world, 6, maps[6], itemList, [
@@ -903,9 +914,9 @@ levels = [
     new Level(ctx, 0, 0, 50, world, 9, maps[9], itemList, [
         exitTest]),
     new Level(ctx, 0, 0, 50, world, 10, maps[10], itemList, [
-        exitTest, floorSwitchTest, eGateTest, gateTest]),
+        exitTest, floorSwitchTest, eGateTest, keyTest]),
     new Level(ctx, 0, 0, 50, world, 11, maps[11], itemList, [
-        exitTest, floorSwitchTest, eGateTest, gateTest]),
+        exitTest, floorSwitchTest, eGateTest, keyTest]),
     new Level(ctx, 0, 0, 50, world, 12, maps[12], itemList, [
         exitTest, floorSwitchTest, eGateTest, ventTest, boardedDoorTest]),
     new Level(ctx, 0, 0, 50, world, 13, maps[13], itemList, [
