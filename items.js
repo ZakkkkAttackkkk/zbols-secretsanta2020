@@ -52,9 +52,9 @@ class Item extends DrawableGroup {
         })
     }
 
-    grab (player, leg, grid, state) {
+    grab (level, leg, state) {
         if (this.grabbable) {
-            var cell = grid.cells.get([player.gy, player.gx]);
+            var cell = level.grid.cells.get([level.player.gy, level.player.gx]);
             var narrow = cell.some((el) => 
                 el.name == "Narrow Shelf");
             if (narrow) {
@@ -122,6 +122,42 @@ class FrontDoor extends Item {
     }
     
     test (level) {
+        if (level.world.fetch) { // fetching rescues
+            if (this.passable) {
+                if (level.player.gx == this.gx &&
+                    level.player.gy == this.gy) {
+                    return [
+                        null,
+                        () => {
+                            states.push(winMenu);
+                        },
+                        []
+                    ];
+                }
+            }
+            else if (level.world.rescues.values.length == 31) {
+                return [
+                    null,
+                    (gate) => {
+                        gate.passable = true;
+                    },
+                    [this]
+                ];
+            }
+        }
+        else {
+            if (level.player.gx == this.gx &&
+                level.player.gy == this.gy) {
+                return [
+                    null,
+                    (level, gate) => {
+                        level.world.fetch = true;
+                        gate.passable = false;
+                    },
+                    [level, this]
+                ];
+            }
+        }
     }
 }
 
@@ -129,6 +165,17 @@ class Floor extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Floor", x, y, len, gx, gy);
         this.passable = true;
+    }
+}
+
+class Tile extends Floor {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Tile", x, y, len, gx, gy);
+    }
+
+    spec (x, y) {
+        this.drawables[0].sx = x;
+        this.drawables[0].sy = y;
     }
 }
 
@@ -467,7 +514,7 @@ class WallSwitch extends Switch {
         this.grabbable = true;
     }
 
-    grab (player, leg, grid, state) {
+    grab (level, leg, state) {
         this.state = !(this.state);
         return false;
     }
@@ -551,6 +598,49 @@ class SwitchGate extends EGate {
     
     set tag (val) {
         this._tag = val;
+    }
+}
+
+class Rescue extends Item {
+    constructor (ctx, name, x, y, len, gx, gy) {
+        super(ctx, name ?? "Rescue", x, y, len, gx, gy);
+        this.grabbable = true;
+    }
+    
+    spec (id) {
+        this.id = id;
+        this.drawables[0].sx = 500;
+        this.drawables[0].sy = 50;
+    }
+
+    grab (level, leg, state) {
+        if (level.world.fetch) {
+            this.grabLeg = state ? leg : null;
+            return true;
+        }
+        else {
+            alert("not yet");
+            return false;
+        }
+    }
+    
+    test (level) {
+        var cell = level.grid.cells.get([this.gy, this.gx]);
+        var gate = cell.find((item) => 
+            item.name == "Front Door"
+        );
+        if (gate != null) {
+            return [
+                null,
+                (level, item) => {
+                    level.world.rescues.add(item.id);
+                    var leg = item.grabLeg;
+                    item.grab(level, leg, false);
+                    level.player.grabItems[leg] = null;
+                }, 
+                [level, this]
+            ]
+        }
     }
 }
 
@@ -679,6 +769,14 @@ class Player extends Item {
 }
 
 itemList = new Map([
+    ["---", [[Tile], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
+    ]]],
+    
+    ["###", [[Rescue], [
+        ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
+    ]]],
+    
     ["WlN", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[0, 0, len, len, x, y, len, len]],
     ]]],
@@ -791,9 +889,6 @@ itemList = new Map([
     ["Sh9", [[Wall, "Shelf"], [
         ["S", "img/tileset.png", (x,y,len)=>[50, 400, len, len, x, y, len, len]],
     ]]],
-    ["ShA", [[Wall, "Shelf"], [
-        ["S", "img/tileset.png", (x,y,len)=>[100, 400, len, len, x, y, len, len]],
-    ]]],
     ["ShB", [[Wall, "Shelf"], [
         ["S", "img/tileset.png", (x,y,len)=>[150, 400, len, len, x, y, len, len]],
     ]]],
@@ -839,9 +934,6 @@ itemList = new Map([
     ]]],
     ["Tb9", [[Item, "Table"], [
         ["S", "img/tileset.png", (x,y,len)=>[250, 400, len, len, x, y, len, len]],
-    ]]],
-    ["TbA", [[Item, "Table"], [
-        ["S", "img/tileset.png", (x,y,len)=>[300, 400, len, len, x, y, len, len]],
     ]]],
     ["TbB", [[Item, "Table"], [
         ["S", "img/tileset.png", (x,y,len)=>[350, 400, len, len, x, y, len, len]],
