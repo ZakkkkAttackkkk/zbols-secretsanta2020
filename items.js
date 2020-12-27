@@ -139,6 +139,7 @@ class FrontDoor extends Item {
                 return [
                     null,
                     (gate) => {
+                        say("That's everyone!")
                         gate.passable = true;
                     },
                     [this]
@@ -151,6 +152,7 @@ class FrontDoor extends Item {
                 return [
                     null,
                     (level, gate) => {
+                        say("Aren't you taking everyone else with you?")
                         level.world.fetch = true;
                         gate.passable = false;
                     },
@@ -619,7 +621,7 @@ class Rescue extends Item {
             return true;
         }
         else {
-            alert("not yet");
+            say("Please don't grab me!");
             return false;
         }
     }
@@ -1209,6 +1211,9 @@ itemList = new Map([
     ]]],
     ["FL1", [[Floor], [
         ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
+    ]]],
+    ["___", [[Floor], [
+        ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#0002", null],
     ]]],
     
     ["EXT", [[Exit], []]],

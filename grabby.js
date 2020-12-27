@@ -68,10 +68,10 @@ winGrid = [
     [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
     [["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
     [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
-    [["FL1"], ["FL0"], ["FL1"], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1"], ["FL0"], ["FL1"], ],
-    [["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0"], ["FL1"], ["FL0"], ],
-    [["FL1"], ["FL0"], ["FL1"], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1"], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1"], ["FL0"], ["FL1"], ],
-    [["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0", ["###", 1]], ["FL1", ["###", 1]], ["FL0"], ["FL1"], ["FL0"], ],
+    [["FL1"], ["FL0"], ["FL1"], ["FL0", ["###", 1]], ["FL1", ["###", 2]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 3]], ["FL0", ["###", 4]], ["FL1"], ["FL0"], ["FL1"], ],
+    [["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 5]], ["FL0", ["###", 6]], ["FL1", ["###", 7]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 8]], ["FL0", ["###", 9]], ["FL1", ["###", 10]], ["FL0"], ["FL1"], ["FL0"], ],
+    [["FL1"], ["FL0"], ["FL1"], ["FL0", ["###", 11]], ["FL1", ["###", 12]], ["FL0", ["###", 13]], ["FL1", ["###", 14]], ["FL0", ["###", 15]], ["FL1"], ["FL0", ["###", 16]], ["FL1", ["###", 17]], ["FL0", ["###", 18]], ["FL1", ["###", 19]], ["FL0", ["###", 20]], ["FL1"], ["FL0"], ["FL1"], ],
+    [["FL0"], ["FL1"], ["FL0"], ["FL1", ["###", 21]], ["FL0", ["###", 22]], ["FL1", ["###", 23]], ["FL0", ["###", 24]], ["FL1", ["###", 25]], ["FL0", ["###", 26]], ["FL1", ["###", 27]], ["FL0", ["###", 28]], ["FL1", ["###", 29]], ["FL0", ["###", 30]], ["FL1", ["###", 31]], ["FL0"], ["FL1"], ["FL0"], ],
     [["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
 ];
 
@@ -79,9 +79,22 @@ winMenu = new WinMenu(ctx, world, winGrid, itemList);
 
 let states = [new MainMenu(ctx, world, menuGrid, itemList)];
 
+function say (msg) {
+    var sec = document.getElementById("message"),
+        p = sec.children[0];
+    sec.classList.remove("hide");
+    p.innerHTML = msg;
+    setTimeout(hide, 200 * msg.length);
+}
+
+function hide () {
+    var sec = document.getElementById("message");
+    sec.classList.add("hide");
+}
+
 function main () {
     log = document.getElementById("debug");
-    var keys = window.localStorage.getItem("grabby-keys");
+    var keys //= window.localStorage.getItem("grabby-keys");
     if (keys == null) {
         window.localStorage.setItem("grabby-keys", JSON.stringify(this.world.keys))
     }
@@ -122,6 +135,7 @@ document.body.onkeydown = function keydown (ev) {
         if (states[start].keydown(ev) == false)
             break;
     }
+    // return false;
 }
 
 document.body.onkeyup = function keyup (ev) {
@@ -129,6 +143,7 @@ document.body.onkeyup = function keyup (ev) {
         if (states[start].keyup(ev) == false)
             break;
     }
+    // return false;
 }
 
 document.body.onkeypress = function keypress (ev) {
@@ -136,6 +151,7 @@ document.body.onkeypress = function keypress (ev) {
         if (states[start].keypress(ev) == false)
             break;
     }
+    // return false;
 }
 
 cnv.onmousedown = function mousedown (ev) {

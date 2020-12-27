@@ -309,12 +309,12 @@ class Level extends GameState {
                 this.player.gy++;
             }
         }
-        else if (ev.code === this.world.keys.spinCC) {
+        else if (ev.code === this.world.keys.spinACC) {
             if (!this.grid.collide(0, 0, -1, this.player)){
                 this.player.startAngle = (this.player.startAngle + 7) % 8
             }
         }
-        else if (ev.code === this.world.keys.spinACC) {
+        else if (ev.code === this.world.keys.spinCC) {
             if (!this.grid.collide(0, 0, 1, this.player)){
                 this.player.startAngle = (this.player.startAngle + 1) % 8
             }
@@ -373,9 +373,9 @@ world = {
         legSW: "KeyZ",
         legW: "KeyA",
         legNW: "KeyQ",
-        spinCC: "KeyS",
-        spinACC: "KeyF",
-        reset: "KeyR",
+        spinCC: "KeyF",
+        spinACC: "CapsLock",
+        reset: "Enter",
     },
     debug: true,
 }
