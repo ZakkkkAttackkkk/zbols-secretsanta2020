@@ -607,12 +607,24 @@ class Rescue extends Item {
     constructor (ctx, name, x, y, len, gx, gy) {
         super(ctx, name ?? "Rescue", x, y, len, gx, gy);
         this.grabbable = true;
+        this.msgs = [
+            "Please don't grab me!",
+            "I would much prefer to be left alone here.",
+            "No grabby!",
+            "Let me be.",
+        ]
     }
     
     spec (id) {
         this.id = id;
-        this.drawables[0].sx = 400;
-        this.drawables[0].sy = 50;
+        var inds = [
+            1, 2, 3, 4, 10, 13, 7,
+            6, 7, 9, 6, 14, 11, 12, 5, 
+            16, 21, 2, 15, 22, 14, 13, 20,
+            11, 3, 17, 18, 19, 23, 4, 8,
+        ];
+        this.drawables[0].sx = 400 + 50 * (inds[id-1] % 12);
+        this.drawables[0].sy = 50 * Math.floor((inds[id-1] / 12));
     }
 
     grab (level, leg, state) {
@@ -621,7 +633,8 @@ class Rescue extends Item {
             return true;
         }
         else {
-            say("Please don't grab me!");
+            var ind = Math.floor(Math.random() * this.msgs.length);
+            say(`<i><q>${this.msgs[ind]}</q></i>`);
             return false;
         }
     }
