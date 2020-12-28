@@ -29,8 +29,7 @@ class MainMenu extends Menu {
         super(ctx, 0, 0, world, map, list);
         this.choices = [
             () => {
-                // setLevel(0, 7, 4, null, null, null, true);
-                setLevel(4, 3, 3, null, null, null, true);
+                setLevel(0, 7, 4, null, null, null, true);
             }
         ];
         this.drawables = [
