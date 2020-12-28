@@ -73,11 +73,12 @@ class Exit extends Item {
         this.dynamic = true;
     }
 
-    spec (tlvl, tx, ty, tang) {
+    spec (tlvl, tx, ty, tang, drop) {
         this.target = tlvl;
         this.tx = tx;
         this.ty = ty;
         this.tangle = tang
+        this.drop = drop
     }
     
     test (level) {
@@ -94,7 +95,7 @@ class Exit extends Item {
                         }
                     }
                 }
-                return[
+                return [
                     "grid",
                     (level, i, a, b, c, d, e, grab) => {
                         if (i != null) {
@@ -107,7 +108,8 @@ class Exit extends Item {
                     [
                         level, i, 
                         this.target, this.tx, this.ty,
-                        [this.gy, this.gx], this.tangle, grab]
+                        [this.gy, this.gx], this.tangle, grab
+                    ]
                 ];
             }
         }
@@ -634,7 +636,7 @@ class Rescue extends Item {
         }
         else {
             var ind = Math.floor(Math.random() * this.msgs.length);
-            say(`<i><q>${this.msgs[ind]}</q></i>`);
+            say(`<q>${this.msgs[ind]}</q>`);
             return false;
         }
     }
@@ -642,9 +644,10 @@ class Rescue extends Item {
     test (level) {
         var cell = level.grid.cells.get([this.gy, this.gx]);
         var gate = cell.find((item) => 
-            item.name == "Front Door"
+            item.name == "Front Door" ||
+            (item.name == "Exit" && item.drop)
         );
-        if (gate != null) {
+        if (gate?.name == "Front Door") {
             return [
                 null,
                 (level, item) => {
@@ -654,6 +657,18 @@ class Rescue extends Item {
                     level.player.grabItems[leg] = null;
                 }, 
                 [level, this]
+            ]
+        }
+        else if (gate?.name == "Exit") {
+            return [
+                null,
+                (level, gate, item) => {
+                    var leg = item.grabLeg;
+                    item.grab(level, leg, false);
+                    level.player.grabItems[leg] = null;
+                    levels[gate.target].grid.push(gate.ty, gate.tx, item);
+                }, 
+                [level, gate, this]
             ]
         }
     }
@@ -1226,7 +1241,7 @@ itemList = new Map([
         ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
     ]]],
     ["___", [[Floor], [
-        ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#0002", null],
+        ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#0009", null],
     ]]],
     
     ["EXT", [[Exit], []]],

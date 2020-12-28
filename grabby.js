@@ -1,8 +1,6 @@
 class Menu extends GameState {
     constructor (ctx, x, y, world, map, list) {
-        super(ctx);
-        this.x = x;
-        this.y = y;
+        super(ctx, x, y);
         this.grid = new Grid(ctx, 0, 0, 50, world);
         this.world = world;
         this.grid.register(map, list);
@@ -31,7 +29,8 @@ class MainMenu extends Menu {
         super(ctx, 0, 0, world, map, list);
         this.choices = [
             () => {
-                setLevel(0, 3, 3, null, null, null, true);
+                // setLevel(0, 7, 4, null, null, null, true);
+                setLevel(4, 3, 3, null, null, null, true);
             }
         ];
         this.drawables = [
@@ -84,7 +83,7 @@ function say (msg) {
         p = sec.children[0];
     sec.classList.remove("hide");
     p.innerHTML = msg;
-    setTimeout(hide, 200 * msg.length);
+    setTimeout(hide, Math.max(150 * p.innerText.length, 2000));
 }
 
 function hide () {

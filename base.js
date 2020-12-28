@@ -333,8 +333,8 @@ class Path extends Drawable {
 }
 
 class GameState extends DrawableGroup {
-    constructor (ctx) {
-        super(ctx);
+    constructor (ctx, x, y) {
+        super(ctx, x, y);
         this.drawables = [];
         this.passDraw = false;
         this.passUpdate = false;

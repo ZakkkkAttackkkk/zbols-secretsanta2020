@@ -162,19 +162,21 @@ class Grid extends DrawableGroup {
 }
 
 class Level extends GameState {
-    constructor (ctx, x, y, len, world, n, map, list) {
-        super(ctx);
-        this.grid = new Grid(ctx, x, y, len, world);
+    constructor (ctx, x, y, len, world, n, map, list, first) {
+        super(ctx, x, y);
+        this.grid = new Grid(ctx, 0, 0, len, world);
         this.world = world;
         this.map = map;
         this.list = list;
         this.grid.register(map, list);
-        this.player = new Player(ctx, x, y, len);
+        this.player = new Player(ctx, 0, 0, len);
         this.drawables = [this.grid, this.player];
         this.elapsed = 0;
         this.n = n;
         this.states = [];
         this.rescues = [];
+        this.first = first;
+        this.rescuing = false;
     }
 
     save () {
@@ -199,6 +201,14 @@ class Level extends GameState {
             this.elapsed += t - this.lastTime;
             log.innerHTML = "";
             if (this.elapsed >= .5) {
+                if (this.first != null) {
+                    say(this.first);
+                    this.first = null;
+                }
+                else if (!this.rescuing && this.world.fetch) {
+                    say("<q>I'm here to get you out!</q>");
+                    this.rescuing = true;
+                }
                 var callbacks = [];
                 this.elapsed -= .5;
                 var end;
@@ -357,7 +367,7 @@ ctx = cnv.getContext("2d");
 world = {
     states: new OptSet(),
     rescues: new OptSet(),
-    fetch: false,
+    fetch: true,
     keys: {
         confirm: "Space",
         back: "Escape",
@@ -374,27 +384,29 @@ world = {
         legW: "KeyA",
         legNW: "KeyQ",
         spinCC: "KeyF",
-        spinACC: "CapsLock",
-        reset: "Enter",
+        spinACC: "KeyS",
+        reset: "KeyP",
     },
-    debug: true,
+    debug: false,
 }
 
 maps = [
-    [0, 0, [ // 0
-        [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Sh4"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "Bx1"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1", "Bx2"], ["FL0"], ["FL1", "Bx1"], ["FL0"], ["FL1"], ["FL0", "Bx2"], ["FL1"], ["FL0", "DrE", ["EXT",1,1,3,0]], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "Bx2"], ["FL1"], ["FL0"], ["FL1", "Sh4"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1"], ["FL0", "WlE"], ],
-        [["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ],
+    [-25, 0, '<table style="display:inline-table"><tr><td><kbd>Q</kbd></td><td><kbd>W</kbd></td><td><kbd>E</kbd></td></tr><tr><td><kbd>A</kbd></td><td>&bull;</td><td><kbd>D</kbd></td></tr><tr><td><kbd>Z</kbd></td><td><kbd>X</kbd></td><td><kbd>C</kbd></td></tr></table> to grab items. <kbd>S</kbd> and <kbd>F</kbd> to spin in either direction. Arrow keys to move.', [ // 0
+        [["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ],
+        [["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ["FL0", "WlN", "___"], ["FL1", "WlN", "___"], ["FL0", "WlN", "___"], ],
+        [["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Sh4"], ["FL1"], ["FL0", "WlE"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ],
+        [["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "WlW"], ["FL1"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "Bx1"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1", "WlE"], ["FL0", "Sh1", "___"], ["FL1", "Sh2", "___"], ["FL0", "Sh2", "___"], ],
+        [["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "WlW"], ["FL0"], ["FL1", "Bx2"], ["FL0"], ["FL1", "Bx1"], ["FL0"], ["FL1"], ["FL0", "Bx2"], ["FL1"], ["FL0", "DrE", ["EXT",1,1,3,0]], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ],
+        [["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "WlW"], ["FL1"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "Bx2"], ["FL1"], ["FL0"], ["FL1", "Sh4"], ["FL0"], ["FL1", "WlE"], ["FL0", "Sh0", "___"], ["FL1", "___"], ["FL0", "Sh1", "___"], ],
+        [["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1"], ["FL0", "WlE"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ],
+        [["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ["FL0", "WlS", "___"], ["FL1", "WlS", "___"], ["FL0", "WlS", "___"], ],
+        [["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ["FL0", "___"], ["FL1", "___"], ],
     ]],
-    [0, 0, [ // 1
+    [0, 0, "Hit <kbd>P</kbd> to reset.", [ // 1
         [["FL1", "WNW"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WNE"], ],
         [["FL0", "WlW"], ["FL1", ["Key", 13]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL1", "WlW"], ["FL0", "Sh1"], ["FL1", "Sh2"], ["FL0", "Sh2"], ["FL1", "Sh3"], ["FL0", ["FSw", 101]], ["FL1", "Sh0"], ["FL0", "WlE"], ],
-        [["FL0", "DrW", ["EXT",0,8,3,4]], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Bx1"], ["FL0", ["EGN", 0, 101]], ["FL1", "DrE", ["EXT",2,1,3,0]], ],
+        [["FL0", "DrW", ["EXT",0,12,4,4]], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Bx1"], ["FL0", ["EGN", 0, 101]], ["FL1", "DrE", ["EXT",2,1,3,0]], ],
         [["FL1", "WlW"], ["FL0", "Sh0"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Bx2"], ["FL1", "Sh0", ["###", 1]], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", ["BdS", 30], ["EXT",8,8,1,2]], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
@@ -432,7 +444,7 @@ maps = [
         [["FL1", "DrW", ["EXT",4,12,2,2]], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh8"], ["FL0", "Tb1"], ["FL1", "Tb3"], ["FL0", "Sh8"], ["FL1", "Tb1"], ["FL0", "Tb3"], ["FL1", "Sh8"], ["FL0"], ["FL1", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1"], ["FL0", "WlE"], ],
         [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-        [["FL0", "WlW"], ["FL1", "Bx1"], ["FL0", "Bx1"], ["FL1", "Sh4"], ["FL0"], ["FL1", ["EXT",13,6,4], "Drn", "DrC"], ["FL0"], ["FL1", "Sh4"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "WlE"], ],
+        [["FL0", "WlW"], ["FL1", "Bx1"], ["FL0", "Bx1"], ["FL1", "Sh4"], ["FL0"], ["FL1", ["EXT",13,6,4,null,1], "Drn", "DrC"], ["FL0"], ["FL1", "Sh4"], ["FL0", "Sh1"], ["FL1", "Sh3"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "WlE"], ],
         [["FL1", "WlW"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "ShC"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "ShC"], ["FL1", "Cbr"], ["FL0", "Bx2"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ]],
@@ -701,27 +713,13 @@ maps = [
         [["FL1", "WlW"], ["FL0", "Sh0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["Key", 6]], ["FL0", "TbF"], ["FL1"], ["FL0", "Sh0"], ["FL1", "WlE"], ],
         [["FL0", "WSW"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ]],
-    
-    // [ // n
-    //     [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-    //     [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-    //     [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-    //     [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-    //     [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-    //     [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-    //     [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-    //     [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-    //     [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-    //     [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-    //     [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
-    //     [["FL1", "WlW"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
-    //     [[], ],
-    // ]
 ];
 
 levels = maps.map((el, i) => {
-    var [r, c, map] = el;
-    return new Level(ctx, r, c, 50, world, i, map, itemList);
+    var r, c, first, map;
+    if (el.length == 4) [r, c, first, map] = el;
+    else [r, c, map] = el;
+    return new Level(ctx, r, c, 50, world, i, map, itemList, first);
 })
 
 function setLevel(level, x, y, srcpos, angle, grab, nopop) {
@@ -729,6 +727,7 @@ function setLevel(level, x, y, srcpos, angle, grab, nopop) {
         states.pop();
     }
     console.log("setting level to",level,"at",x,y,"with",grab,"at",angle);
+    hide();
     var target = levels[level];
     target.player.gx = x;
     target.player.gy = y;

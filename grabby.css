@@ -1,16 +1,13 @@
 * {
-    position: fixed;
     margin: 0;
     padding: 0;
-    height: auto;
-    width: auto;
     font-family: sans-serif;
     transition: all .4s ease;
 }
-
 html, body {
     height: 450;
     width: 800;
+    position: fixed;
 }
 
 canvas {
@@ -21,9 +18,9 @@ canvas {
     position: absolute;
     left: 50;
     right: 50;
-    top: 300;
-    bottom: 50;
-    background: #fffa;
+    top: 350;
+    bottom: 25;
+    background: #fff6;
     color: #000;
     text-align: center;
     vertical-align: middle;
@@ -36,8 +33,24 @@ canvas {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    width: 100%;
+}
+
+#message * {
+    text-align: center;
+    vertical-align: middle;
 }
 
 .hide {
     opacity: 0%;
+}
+
+kbd {
+    border: 1px solid #aaa;
+    background: #aaa5;
+    font-family: monospace;
+}
+
+q {
+    font-style: italic;
 }
