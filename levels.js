@@ -111,14 +111,18 @@ class Grid extends DrawableGroup {
 
     // Check if the cell at the given position is hoverable
     hoverable (r, c) {
-        var cell = this.cells.get([r, c]);
+        var cell = this.cells.get([r, c]).filter(
+            (item) => item.hoverable != null
+        );
         if (cell === undefined) return false;
         return cell[cell.length - 1].hoverable;
     }
 
     // Check if the cell at the given position is passable
     passable (r, c) {
-        var cell = this.cells.get([r, c]);
+        var cell = this.cells.get([r, c]).filter(
+            (item) => item.passable != null
+        );
         if (cell === undefined) return false;
         return !(cell.some((item) => item.passable == false));
     }
@@ -221,12 +225,12 @@ class Level extends GameState {
                             var [skip, func, args] = ret;
                             callbacks.push([func, args]);
                             if (skip != null) {
+                                console.log(`skipping ${skip} at ${pos}`,cell[i]);
                                 i = -1;
                                 if (skip == "grid") {
                                     i--;
                                     end = true;
                                 }
-                                console.log(`skipping ${skip} at ${pos}`,cell[i]);
                                 break;
                             }
                         }
@@ -367,7 +371,7 @@ ctx = cnv.getContext("2d");
 world = {
     states: new OptSet(),
     rescues: new OptSet(),
-    fetch: true,
+    fetch: false,
     keys: {
         confirm: "Space",
         back: "Escape",
@@ -387,7 +391,7 @@ world = {
         spinACC: "KeyS",
         reset: "KeyP",
     },
-    debug: true,
+    debug: false,
 }
 
 maps = [
@@ -513,7 +517,7 @@ maps = [
         [["FL1", "WlW"], ["FL0", ["FSw", 1204]], ["FL1"], ["FL0", "Tb1"], ["FL1", "Tb3"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0", ["EGN", 0, 1202]], ["FL1", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["EGN", 0, 1200]], ["FL0", "WlE"], ],
         [["FL1", "DrW", ["EXT",11,9,5,4]], ["FL0"], ["FL1"], ["FL0", "Sh4", ["###", 12]], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh2"], ["FL0", "Sh3"], ["FL1"], ["FL0"], ["FL1", ["BdE", 40], ["EXT",13,1,4,0]], ],
-        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1"], ["FL0", "Ldr"], ["FL1", "Sh0"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
+        [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1", "ShC"], ["FL0"], ["FL1", "Bx2"], ["FL0", "Ldr"], ["FL1", "Sh0"], ["FL0"], ["FL1"], ["FL0", "WlE"], ],
         [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", ["EXT",20,1,1,0], "M2S", ["XDS", 15]], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WSE"], ],
     ]],
     [0, 0, [ // 13
@@ -521,7 +525,7 @@ maps = [
         [["FL0", "WlW"], ["FL1", "Bx1"], ["FL0", "Sh4"], ["FL1"], ["FL0", "Sh1"], ["FL1", "Sh2"], ["FL0", "Sh3"], ["FL1", "Tb1", "Cbr"], ["FL0", "Tb3"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "WlE"], ],
         [["FL1", "WlW"], ["FL0", ["EGN", 0, 1300]], ["FL1", "ShC"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Tb4"], ["FL1", ["S2N", 0, 21]], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1", ["FSw", 1300]], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Tb0"], ["FL0"], ["FL1", "Tb0"], ["FL0"], ["FL1", "Sh4"], ["FL0", "Wir"], ["FL1", "ShC"], ["FL0"], ["FL1", ["EXT",14,1,3,0], "DrE"], ],
-        [["FL1", ["BdW", 40], ["EXT",12,9,5,6]], ["FL0", ["EGN", 0, 1300]], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Sh8"], ["FL1"], ["FL0"], ["FL1", "Sh0"], ["FL0", "WlE"], ],
+        [["FL1", ["BdW", 40], ["EXT",12,9,5,4]], ["FL0", ["EGN", 0, 1300]], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Sh8"], ["FL1"], ["FL0"], ["FL1", "Sh0"], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Sh1", ["###", 13]], ["FL1", "Sh2"], ["FL0", "Sh2"], ["FL1", "Sh3"], ["FL0"], ["FL1", "ShC"], ["FL0", "Sh0"], ["FL1"], ["FL0", ["Key", 18]], ["FL1", "WlE"], ],
         [["FL1", "WSW"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WlS"], ["FL1", "WlS"], ["FL0", "WSE"], ],
     ]],
@@ -529,7 +533,7 @@ maps = [
         [["FL0", "WNW"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "M5N", ["XDN", 18.1], ["EXT",6,6,5,6]], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WlN"], ["FL0", "WlN"], ["FL1", "WNE"], ],
         [["FL1", "WlW"], ["FL0", "Sh0"], ["FL1", "Tb1"], ["FL0", "Tb2"], ["FL1", "Tb2"], ["FL0", "Tb3"], ["FL1"], ["FL0"], ["FL1", "Tb1"], ["FL0", "Tb3"], ["FL1", "Sh0"], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "M5E", ["XDE", 18.2], ["EXT",15,1,3,0]], ],
-        [["FL1", "DrW", ["EXT",13,12,3,4]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Tb5"], ["FL1", "Tb7"], ["FL0"], ["FL1"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "WlE"], ],
+        [["FL1", "DrW", ["EXT",13,12,3,6]], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0", "Tb5"], ["FL1", "Tb7"], ["FL0"], ["FL1"], ["FL0", "Bx1"], ["FL1", "Bx2"], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1", "Bx1"], ["FL0", "Tb4"], ["FL1", "Bx2"], ["FL0"], ["FL1", "TbD"], ["FL0", "TbF"], ["FL1"], ["FL0"], ["FL1", "Bx2"], ["FL0", "Bx2"], ["FL1", "WlE"], ],
         [["FL1", "WlW"], ["FL0", ["FSw", 1402], "Bx2"], ["FL1", "Tb8", ["Key", 11]], ["FL0", "Bx2"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", "Sh1"], ["FL0", "Sh2"], ["FL1", "Sh3"], ["FL0", "WlE"], ],
         [["FL0", "WlW"], ["FL1", "Bx2"], ["FL0", "TbC"], ["FL1", "Bx1"], ["FL0"], ["FL1"], ["FL0"], ["FL1", ["EGN", 1, 1402]], ["FL0", ["KB5", 11]], ["FL1"], ["FL0", "Tb0", ["###", 14]], ["FL1", "WlE"], ],

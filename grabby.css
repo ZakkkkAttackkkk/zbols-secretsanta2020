@@ -19,7 +19,7 @@ canvas {
     left: 50;
     right: 50;
     top: 350;
-    bottom: 25;
+    height: 75;
     background: #fff6;
     color: #000;
     text-align: center;

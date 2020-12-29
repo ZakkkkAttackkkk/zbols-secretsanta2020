@@ -212,6 +212,8 @@ class DrawableGroup {
 
 class Sprite extends Drawable {
     constructor (ctx, src, x, y, w, h, x_, y_, w_, h_) {
+        w_ ??= w;
+        h_ ??= h;
         if (x_ !== undefined){
             super(ctx, x_, y_, w_, h_);
             this._sx = x;

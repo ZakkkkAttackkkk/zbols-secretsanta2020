@@ -30,10 +30,16 @@ class MainMenu extends Menu {
         this.choices = [
             () => {
                 setLevel(0, 7, 4, null, null, null, true);
+                // setLevel(5, 7, 4, null, null, null, true);
             }
         ];
         this.drawables = [
             this.grid,
+            new Sprite(ctx, "img/tileset.png", 400, 550, 600, 100, 50, 50),
+            new Sprite(ctx, "img/tileset.png", 500, 650, 500, 100, 150, 150),
+            new Sprite(ctx, "img/tileset.png", 300, 550, 100, 100, 650, 150),
+            new Sprite(ctx, "img/tileset.png", 0, 500, 250, 50, 200, 300),
+            new Sprite(ctx, "img/tileset.png", 350, 650, 150, 50, 450, 300),
         ];
     }
 }
@@ -52,12 +58,24 @@ class WinMenu extends Menu {
         this.drawables = [
             this.grid,
             this.player,
+            new Sprite(ctx, "img/tileset.png", 0, 550, 300, 100, 100, 50),
+            new Sprite(ctx, "img/tileset.png", 0, 650, 300, 100, 450, 50),
+            new Sprite(ctx, "img/tileset.png", 0, 500, 250, 50, 200, 150),
+            new Sprite(ctx, "img/tileset.png", 350, 700, 150, 50, 450, 150),
         ];
     }
 }
 
 menuGrid = [
-    [["FL0"], ],
+    [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
+    [["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+    [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
+    [["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+    [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
+    [["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+    [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
+    [["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ],
+    [["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ["FL0"], ["FL1"], ],
 ];
 
 winGrid = [
@@ -77,12 +95,14 @@ winMenu = new WinMenu(ctx, world, winGrid, itemList);
 
 let states = [new MainMenu(ctx, world, menuGrid, itemList)];
 
-function say (msg) {
+function say (msg, top, height, time) {
     var sec = document.getElementById("message"),
         p = sec.children[0];
+    sec.style.top = top;
+    sec.style.height = height;
     sec.classList.remove("hide");
     p.innerHTML = msg;
-    setTimeout(hide, Math.max(150 * p.innerText.length, 2000));
+    setTimeout(hide, time ?? Math.max(150 * p.innerText.length, 2000));
 }
 
 function hide () {
