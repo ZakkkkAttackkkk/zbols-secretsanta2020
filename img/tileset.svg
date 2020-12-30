@@ -1914,8 +1914,8 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="389.1998"
-     inkscape:cy="646.33575"
+     inkscape:cx="445.76835"
+     inkscape:cy="420.06158"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -22470,7 +22470,7 @@ AAAAAAAAAACYjkgV94k6AQAAAAAAAAAAM/o9baoKs05CaiMAAAAASUVORK5CYII=
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Y"
-     style="display:inline;opacity:0.995"
+     style="display:none;opacity:0.995"
      sodipodi:insensitive="true">
     <text
        xml:space="preserve"
@@ -25118,7 +25118,7 @@ AAAAAAAAAACYjkgV94k6AQAAAAAAAAAAM/o9baoKs05CaiMAAAAASUVORK5CYII=
      id="layer3"
      inkscape:label="X"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none">
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:2.11667px;line-height:1.25;font-family:sans-serif;text-align:start;text-anchor:start;opacity:0.995;mix-blend-mode:normal;fill:#008000;fill-opacity:1;stroke:none;stroke-width:0.132292;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers stroke fill"

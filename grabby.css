@@ -3,6 +3,9 @@
     padding: 0;
     font-family: sans-serif;
     transition: all .4s ease;
+    color: #000;
+    text-align: center;
+    vertical-align: middle;
 }
 html, body {
     height: 450;
@@ -14,31 +17,28 @@ canvas {
     box-shadow: 0 0 0 2px #000;
 }
 
-#message {
+section {
     position: absolute;
+    background: #fffa;
+}
+
+#message {
     left: 50;
     right: 50;
     top: 350;
     height: 75;
-    background: #fffa;
-    color: #000;
     text-align: center;
     vertical-align: middle;
     border: 2px solid #000;
     border-radius: 10px;
 }
 
-#message > * {
+section > * {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
-}
-
-#message * {
-    text-align: center;
-    vertical-align: middle;
 }
 
 .hide {
@@ -53,4 +53,12 @@ kbd {
 
 q {
     font-style: italic;
+}
+
+#saved {
+    right: 5;
+    top: 5;
+    width: 100;
+    height: 50;
+    font-size: 2em;
 }

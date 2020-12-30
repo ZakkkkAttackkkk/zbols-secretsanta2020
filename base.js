@@ -268,7 +268,6 @@ class Sprite extends Drawable {
     }
 
     draw () {
-        // console.log("draw", this, ...arguments);
         var mat = this.ctx.getTransform();
         this.ctx.save();
         this.ctx.setTransform(
@@ -310,7 +309,6 @@ class Path extends Drawable {
     }
 
     draw () {
-        // console.log("draw", this, ...arguments);
         var mat = this.ctx.getTransform();
         this.ctx.save();
         this.ctx.setTransform(
@@ -345,11 +343,10 @@ class GameState extends DrawableGroup {
 
     update (t) {
         this.lastTime = t;
-        // console.log("update", this, ...arguments);
     }
 
     log () {
-        // console.log("log", this, ...arguments);
+        console.log("log", this, ...arguments);
     }
 }
 Object.assign(GameState.prototype, GameEventTarget);

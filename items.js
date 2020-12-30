@@ -144,6 +144,7 @@ class FrontDoor extends Item {
                 return [
                     null,
                     () => {
+                        document.getElementById("saved").classList.add("hide");
                         states.push(winMenu);
                     },
                     []
@@ -157,7 +158,10 @@ class FrontDoor extends Item {
                     null,
                     (level, gate) => {
                         say("<q>Aren't you taking everyone else with you?</q>");
-                        level.world.fetch = true;
+                        level.world.fetch = 1;
+                        var sec = document.getElementById("saved");
+                        sec.classList.remove("hide");
+                        sec.children[0].innerHTML = "00/31"
                         gate.passable = false;
                     },
                     [level, this]
@@ -656,6 +660,9 @@ class Rescue extends Item {
                 null,
                 (level, item) => {
                     level.world.rescues.add(item.id);
+                    var p = document.getElementById("saved").children[0];
+                    var count = (100 + level.world.rescues.values.length).toString();
+                    p.innerHTML = count.slice(1) + "/31";
                     var leg = item.grabLeg;
                     item.grab(level, leg, false);
                     level.player.grabItems[leg] = null;

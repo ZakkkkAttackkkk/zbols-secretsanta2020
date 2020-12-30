@@ -194,7 +194,6 @@ class Level extends GameState {
         }
         else {
             this.elapsed += t - this.lastTime;
-            log.innerHTML = "";
             if (this.elapsed >= .5) {
                 if (this.first != null) {
                     say(this.first);
@@ -237,17 +236,11 @@ class Level extends GameState {
                         if (skip == "grid") break;
                     }
                 }
-                // if (callbacks.length) console.log(callbacks);
                 callbacks.forEach((cbck) => {
                     var [fn, args] = cbck;
                     fn(...args);
                 });
             }
-            log.innerHTML += 
-            `{${this.world.fetch}}\n` +
-            `{${this.world.states.values.join(",")}}\n` +
-            `{${this.world.rescues.values.join(",")}}\n` +
-            `Level ${Math.floor(this.n/8)+1}-${this.n%8+1} (#${this.n}): (${[this.player.gx,this.player.gy]})`;
         }
         this.lastTime = t;
     }

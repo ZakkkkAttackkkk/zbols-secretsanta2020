@@ -152,17 +152,3 @@ document.body.onkeydown = function keydown (ev) {
             break;
     }
 }
-
-document.body.onkeyup = function keyup (ev) {
-    for (start = states.length - 1; start >= 0; start--) {
-        if (states[start].keyup(ev) == false)
-            break;
-    }
-}
-
-document.body.onkeypress = function keypress (ev) {
-    for (start = states.length - 1; start >= 0; start--) {
-        if (states[start].keypress(ev) == false)
-            break;
-    }
-}
