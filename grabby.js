@@ -110,7 +110,6 @@ function hide () {
 }
 
 function main () {
-    log = document.getElementById("debug");
     var keys = window.localStorage.getItem("grabby-keys");
     if (keys == null) {
         window.localStorage.setItem("grabby-keys", JSON.stringify(this.world.keys))
@@ -143,7 +142,7 @@ function run (t) {
         window.requestAnimationFrame(run);
     }
     else {
-        // window.close();
+        states.push(new MainMenu);
     }
 }
 
@@ -152,7 +151,6 @@ document.body.onkeydown = function keydown (ev) {
         if (states[start].keydown(ev) == false)
             break;
     }
-    // return false;
 }
 
 document.body.onkeyup = function keyup (ev) {
@@ -160,34 +158,11 @@ document.body.onkeyup = function keyup (ev) {
         if (states[start].keyup(ev) == false)
             break;
     }
-    // return false;
 }
 
 document.body.onkeypress = function keypress (ev) {
     for (start = states.length - 1; start >= 0; start--) {
         if (states[start].keypress(ev) == false)
-            break;
-    }
-    // return false;
-}
-
-cnv.onmousedown = function mousedown (ev) {
-    for (start = states.length - 1; start >= 0; start--) {
-        if (states[start].mousedown(ev) == false)
-            break;
-    }
-}
-
-cnv.onmouseup = function mouseup (ev) {
-    for (start = states.length - 1; start >= 0; start--) {
-        if (states[start].mouseup(ev) == false)
-            break;
-    }
-}
-
-cnv.onmousepress = function mousepress (ev) {
-    for (start = states.length - 1; start >= 0; start--) {
-        if (states[start].mousepress(ev) == false)
             break;
     }
 }

@@ -54,7 +54,6 @@ class Item extends DrawableGroup {
 
     grab (level, leg, state) {
         if (this.grabbable) {
-            console.log(level,leg,state,this);
             var cell = level.grid.cells.get([level.player.gy, level.player.gx]);
             var narrow = cell.some((el) => 
                 el.name == "Narrow Shelf");
@@ -378,7 +377,6 @@ class Crowbar extends Item {
         var gate = cell.find((item) => 
             item.name == "Drain Cover" || item.name == "Boarded Door"
         );
-        log.innerHTML += `${cell.map((el)=>el.name).join(",")} | ${gate?.name}\n`;
         if (gate != null) {
             return [
                 "cell",
@@ -423,7 +421,6 @@ class Key extends Item {
             !item.state,
             this);
         if (gate != null) {
-            console.log(this.grabLeg);
             return [
                 null,
                 (gate, item, player, states) => {
@@ -577,7 +574,6 @@ class EGate extends Gate {
     
     test (level) {
         var cell = level.grid.cells.get([this.gy, this.gx]);
-        log.innerHTML += `${[]}\n`
         if (cell[cell.length-1] != this ||
             (level.player.gx == this.gx && 
             level.player.gy == this.gy) ||
@@ -851,7 +847,6 @@ itemList = new Map([
     ["CSE", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[250, 50, len, len, x, y]],
     ]]],
-    ["XXX", [[Wall], []]],
     
     ["Bx1", [[Item, "Box", true, false, false], [
         ["S", "img/tileset.png", (x,y,len)=>[300, 500, len, len, x, y]],
@@ -1249,7 +1244,7 @@ itemList = new Map([
     ["FL1", [[Floor], [
         ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#777", null],
     ]]],
-    ["___", [[Floor], [
+    ["___", [[Wall], [
         ["P", (len)=>["M0 0h","v","h-","z"].join(len), "#0009", null],
     ]]],
     
