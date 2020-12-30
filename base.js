@@ -1,12 +1,46 @@
 function bisect (arr, el) {
-    var a = 0, z = arr.length, m = -1;
-    while (a < z) {
+    var a = 0, z = arr.length, m;
+    for(;;) {
         m = Math.floor((a+z)/2);
-        if (arr[m] == el) return m;
+        if (arr[m] == el || a == z) return m;
         if (arr[m] < el) a = m + 1;
         else z = m;
     }
-    return m+1;
+}
+
+class OptSet {
+    constructor () {
+        this.values = [];
+    }
+
+    add (data) {
+        var ind = bisect(this.values, data);
+        if (this.values[ind] != data || this.values[ind] == undefined) {
+            this.values.splice(ind,0,data);
+        }
+    }
+
+    remove (data) {
+        var ind = bisect(this.values, data);
+        if (this.values[ind] == data) {
+            this.values.splice(ind,1);
+        }
+    }
+
+    toggle (data) {
+        var ind = bisect(this.values, data);
+        if (this.values[ind] != data || this.values[ind] == undefined) {
+            this.values.splice(ind,0,data);
+        }
+        else {
+            this.values.splice(ind,1);
+        }
+    }
+
+    has (data) {
+        var ind = bisect(this.values, data);
+        return this.values[ind] == data;
+    }
 }
 
 class Trie {
@@ -52,6 +86,20 @@ class Trie {
         this.values.forEach((trie, ind) => {
             trie.forEach(fn, [...key,this.keys[ind]]);
         })
+    }
+
+    entries () {
+        return {trie:this,
+            *[Symbol.iterator]() {
+            if (this.trie.data != undefined) {
+                yield [[], this.trie.data];
+            }
+            for (var i = 0; i < this.trie.keys.length; i++){
+                for (var [key, val] of this.trie.values[i].entries()) {
+                    yield [[this.trie.keys[i], ...key], val];
+                }
+            }
+        }}
     }
 }
 
@@ -164,6 +212,8 @@ class DrawableGroup {
 
 class Sprite extends Drawable {
     constructor (ctx, src, x, y, w, h, x_, y_, w_, h_) {
+        w_ ??= w;
+        h_ ??= h;
         if (x_ !== undefined){
             super(ctx, x_, y_, w_, h_);
             this._sx = x;
@@ -218,7 +268,6 @@ class Sprite extends Drawable {
     }
 
     draw () {
-        // console.log("draw", this, ...arguments);
         var mat = this.ctx.getTransform();
         this.ctx.save();
         this.ctx.setTransform(
@@ -260,7 +309,6 @@ class Path extends Drawable {
     }
 
     draw () {
-        // console.log("draw", this, ...arguments);
         var mat = this.ctx.getTransform();
         this.ctx.save();
         this.ctx.setTransform(
@@ -285,8 +333,8 @@ class Path extends Drawable {
 }
 
 class GameState extends DrawableGroup {
-    constructor (ctx) {
-        super(ctx);
+    constructor (ctx, x, y) {
+        super(ctx, x, y);
         this.drawables = [];
         this.passDraw = false;
         this.passUpdate = false;
@@ -295,11 +343,10 @@ class GameState extends DrawableGroup {
 
     update (t) {
         this.lastTime = t;
-        // console.log("update", this, ...arguments);
     }
 
     log () {
-        // console.log("log", this, ...arguments);
+        console.log("log", this, ...arguments);
     }
 }
 Object.assign(GameState.prototype, GameEventTarget);
