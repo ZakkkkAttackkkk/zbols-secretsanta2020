@@ -30,7 +30,6 @@ class MainMenu extends Menu {
         this.choices = [
             () => {
                 setLevel(0, 7, 4, null, null, null, true);
-                // setLevel(5, 7, 4, null, null, null, true);
             }
         ];
         this.drawables = [
@@ -112,7 +111,7 @@ function hide () {
 
 function main () {
     log = document.getElementById("debug");
-    var keys //= window.localStorage.getItem("grabby-keys");
+    var keys = window.localStorage.getItem("grabby-keys");
     if (keys == null) {
         window.localStorage.setItem("grabby-keys", JSON.stringify(this.world.keys))
     }

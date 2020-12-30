@@ -125,27 +125,29 @@ class FrontDoor extends Item {
     }
     
     test (level) {
-        if (level.world.fetch) { // fetching rescues
-            if (this.passable) {
-                if (level.player.gx == this.gx &&
-                    level.player.gy == this.gy) {
-                    return [
-                        null,
-                        () => {
-                            states.push(winMenu);
-                        },
-                        []
-                    ];
-                }
-            }
-            else if (level.world.rescues.values.length == 31) {
+        if (level.world.fetch == 1) { // fetching rescues
+            this.passable = false;
+            if (level.world.rescues.values.length == 31) {
                 return [
                     null,
                     (gate) => {
-                        say("That's everyone!")
-                        gate.passable = true;
+                        say("That's everyone!");
+                        level.world.fetch = 2;
                     },
                     [this]
+                ];
+            }
+        }
+        else if (level.world.fetch == 2) { // all rescued
+            this.passable = true;
+            if (level.player.gx == this.gx &&
+                level.player.gy == this.gy) {
+                return [
+                    null,
+                    () => {
+                        states.push(winMenu);
+                    },
+                    []
                 ];
             }
         }
@@ -155,7 +157,7 @@ class FrontDoor extends Item {
                 return [
                     null,
                     (level, gate) => {
-                        say("Aren't you taking everyone else with you?")
+                        say("<q>Aren't you taking everyone else with you?</q>");
                         level.world.fetch = true;
                         gate.passable = false;
                     },
@@ -353,13 +355,14 @@ class DrainCover extends Item {
     }
     
     test (level) {
-        var ret = [
-            "cell",
-            (pop, grid, x, y) => {if (pop) grid.pop(x, y)},
-            [level.world.states.has(this.tag), level.grid, this.gx, this.gy]
-        ];
-        log.innerHTML += `${ret}\n`;
-        return ret;
+        if (level.world.states.has(this.tag)) {
+            return [
+                "grid",
+                (grid, x, y) => grid.pop(y, x),
+                [level.grid, this.gx, this.gy]
+            ];
+        }
+        else return ["cell",()=>{},[]];
     }
 }
 
@@ -848,6 +851,7 @@ itemList = new Map([
     ["CSE", [[Wall], [
         ["S", "img/tileset.png", (x,y,len)=>[250, 50, len, len, x, y]],
     ]]],
+    ["XXX", [[Wall], []]],
     
     ["Bx1", [[Item, "Box", true, false, false], [
         ["S", "img/tileset.png", (x,y,len)=>[300, 500, len, len, x, y]],
